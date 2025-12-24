@@ -64,6 +64,8 @@ const communitiesData = [
     title: "Community of Software Development",
     description: "This community is the core engine for building robust, scalable applications. We cover everything from Data Structures & Algorithms (DSA) to full-stack web and mobile development, focusing on clean code and deployment best practices.",
     activities: [
+      "5-Day Workshop on Python",
+      "10-Day workshop on C Programming",
       "Weekly Competitive Programming Sessions",
       "Full-Stack Development Bootcamps (MERN)",
       "Version Control (Git) workshops",
@@ -145,7 +147,7 @@ const communitiesData = [
     title: "Community of Cybersecurity & Blockchain",
     description: "A community focused on digital security, exploring how to defend systems from attacks (Cybersecurity) and how to build decentralized, tamper-proof applications (Blockchain/Web3).",
     activities: [
-      "Capture The Flag (CTF) challenges",
+      "5 Day workshop on Cyber Awareness",
       "Network Penetration Testing workshops",
       "Blockchain Fundamentals & Cryptography",
       "Smart Contract Development (Solidity)"

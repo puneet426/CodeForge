@@ -87,17 +87,23 @@ const pastEvents = [
   {
     id: 5,
     title: "TECH TALK",
+    date: "July 2025",
+    image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766582739/code_forge_website_designs_1_nftss4.png"
+  },
+  {
+    id: 6,
+    title: "TECH TALK",
     date: "April 2025",
     image: "https://media.licdn.com/dms/image/v2/D4D22AQH_bmmpqsc6CA/feedshare-shrink_2048_1536/B4DZY.PIs6HsAo-/0/1744801032002?e=1768435200&v=beta&t=SJqgZ7uEaTTNi_EZK6l-QyaDPyoR28nUVpY7VGmQXrc"
   },
   {
-    id: 6,
+    id: 7,
     title: "Kartavya Tech Event x <Code/Forge>",
     date: "March 2025",
     image: "https://media.licdn.com/dms/image/v2/D4E22AQHlCWDGXKDipA/feedshare-shrink_800/B4EZVyZD8EHMAo-/0/1741380928441?e=1768435200&v=beta&t=VgbfLCgRRoeL2GQhPOVxldnfIZxppXoZcl4ngiyP5kc"
   },
   {
-    id: 7,
+    id: 8,
     title: "TECH TALK",
     date: "Feb 2025",
     image: "https://media.licdn.com/dms/image/v2/D4D22AQGzhf1Psrsx2A/feedshare-shrink_2048_1536/B4DZUdSYYyHwA0-/0/1739953116487?e=1768435200&v=beta&t=YfU19Do_mPYU4nt_bDVHyJCCSBoNVO1dw7bDAghxyH4"
