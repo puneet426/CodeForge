@@ -40,7 +40,7 @@ const communitiesData = [
       { 
         name: "Wartika Narayan", 
         role: "Core Team",
-        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766576162/WhatsApp_Image_2025-12-24_at_17.02.39_ygk8fj.jpg"
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766567796/WhatsApp_Image_2025-12-24_at_14.45.15_ik6mlw.jpg"
       },
       { 
         name: "Devika Suresh", 
@@ -333,13 +333,7 @@ const Communities = () => {
       </div>
 
       {/* Back to Home Link */}
-      <div className="text-center mt-16 pt-8 border-t border-white/10">
-        <Link to="/">
-            <button className="px-8 py-3 text-sm font-bold text-black bg-forge-yellow rounded hover:bg-yellow-400 transition-colors font-mono shadow-[0_0_15px_rgba(255,215,0,0.4)]">
-                [ Return to Main Terminal ]
-            </button>
-        </Link>
-      </div>
+      
 
     </div>
   );
