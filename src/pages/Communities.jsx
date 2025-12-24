@@ -1,0 +1,348 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+// =========================================
+// DATA: Community Information
+// =========================================
+const communitiesData = [
+  {
+    id: 1,
+    title: "Media Cell & Event Management",
+    description: "The creative voice and organizational backbone of Code Forge. This community manages the club's public image, documents events through photography and videography, designs creative assets, and ensures the seamless execution of all club activities and hackathons.",
+    activities: [
+      "Event Photography, Videography & Editing",
+      "Social Media Content Strategy (Reels/Posts)",
+      "Graphic Design & Branding Workshops",
+      "Event Logistics, Sponsorship & Public Relations"
+    ],
+    technologies: [
+     { name: "Figma/Canva", color: "text-purple-400 border-purple-400" },
+    ],
+    projects: ["Python Workshop Aftermovie"],
+   
+    // UPDATED HEADS DATA WITH IMAGES
+    heads: [
+      { 
+        name: "Puneet Tiwari", 
+        role: "Media Cell Lead",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQERwXorHIXmAg/profile-displayphoto-scale_400_400/B56Zsb17njI4Ag-/0/1765698683231?e=1768435200&v=beta&t=9g7rRf2ZxmV3yjPJWElE47CZz8ArOQsGhmWwwb3kN8s"
+      },
+      { 
+        name: "Ashutosh Pandey", 
+        role: "Event Management Lead",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766576161/WhatsApp_Image_2025-12-24_at_17.04.08_dzoohz.jpg"
+      },
+      { 
+        name: "Akash Kumar", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1768435200&v=beta&t=nAUxDYR_dJuZ2mC3acIsH5RldJcXUbr72Ng3-CW8iH0"
+      },
+      { 
+        name: "Wartika Narayan", 
+        role: "Core Team",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766576162/WhatsApp_Image_2025-12-24_at_17.02.39_ygk8fj.jpg"
+      },
+      { 
+        name: "Devika Suresh", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D4D03AQG9T2Ct2z5xnw/profile-displayphoto-scale_400_400/B4DZf583cKG8Ag-/0/1752245175403?e=1768435200&v=beta&t=egQdW7xXMwmWnYq019J5bpBNiSKdbWCt7g36-4xDioc"
+      },
+      { 
+        name: "Priya Kumari", 
+        role: "Core Team",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766569060/WhatsApp_Image_2025-12-24_at_15.05.55_zplupp.jpg"
+      },
+      { 
+        name: "Abhishek Kumar", 
+        role: "Core Team",
+        image: "https://ui-avatars.com/api/?name=Abhishek+Kumar&background=FFD700&color=0a0a0a&size=128&font-size=0.4"
+      },
+    ]
+  },
+  {
+    id: 2,
+    title: "Community of Software Development",
+    description: "This community is the core engine for building robust, scalable applications. We cover everything from Data Structures & Algorithms (DSA) to full-stack web and mobile development, focusing on clean code and deployment best practices.",
+    activities: [
+      "Weekly Competitive Programming Sessions",
+      "Full-Stack Development Bootcamps (MERN)",
+      "Version Control (Git) workshops",
+      "Open Source Contribution drives"
+    ],
+    technologies: [
+      { name: "React/Next.js", color: "text-blue-400 border-blue-400" },
+      { name: "Node.js/Express", color: "text-green-400 border-green-400" },
+      { name: "MongoDB/PostgreSQL", color: "text-yellow-600 border-yellow-600" },
+      { name: "C++ (DSA)", color: "text-purple-400 border-purple-400" }
+    ],
+    projects: ["Portfolio Website", "Job Portal Clone"],
+    // UPDATED HEADS DATA WITH IMAGES
+    heads: [
+      { 
+        name: "Rohit Raj", 
+        role: "Competitive Programming Lead",
+        image: "https://media.licdn.com/dms/image/v2/D4E03AQG9CjmmcdEfqA/profile-displayphoto-scale_400_400/B4EZnd_m3iKcAg-/0/1760366066064?e=1768435200&v=beta&t=IXFWf6cQfoChOnbjgWgLQFle1rC-NebXPnLxfErlQS0"
+      },
+      { 
+        name: "Rana Poddar", 
+        role: "Web Development Lead",
+        image: "https://rtime2025.netlify.app/Images/Members/S9.jpg"
+      },
+      { 
+        name: "Prince Kumar", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQED7tX9tKvTmQ/profile-displayphoto-shrink_400_400/B56ZeHh4EnG0Ak-/0/1750325513885?e=1768435200&v=beta&t=hX2gFeBBFp4bYebvF0gzjzZ5c2HFrEc3pF9Cnbvb0e4"
+      },
+      { 
+        name: "Md Danish Ali", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGfcuU3wcKBGw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727350008622?e=1768435200&v=beta&t=ZQSZ23Rd7b0jQazBjE2uH7FDdcHBh_6GewvTVeiXBPA"
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: "  Community of Data Science & Artificial Intelligence ",
+    description: "This community dives into the world of intelligent systems, teaching the principles of Machine Learning, Deep Learning, and effective Data Analysis to solve complex, real-world predictive and classification problems.",
+    activities: [
+      "Kaggle Competitions & Workshops",
+      "Introduction to Python & Data Science Libraries (Pandas, NumPy)",
+      "Deep Learning Frameworks (TensorFlow, PyTorch)",
+      "Data Visualization & Storytelling"
+    ],
+    technologies: [
+      { name: "Python", color: "text-yellow-400 border-yellow-400" },
+      { name: "TensorFlow/PyTorch", color: "text-orange-400 border-orange-400" },
+      { name: "Scikit-learn", color: "text-blue-400 border-blue-400" },
+      { name: "Jupyter/Colab", color: "text-green-400 border-green-400" }
+    ],
+    projects: ["Sentiment Analyzer", "Handwritten Digit Recognizer (CNN)", "Predictive Maintenance Model"],
+    heads: [
+      { 
+        name: "Trishna Verma", 
+        role: "Lead ",
+        image: "https://rtime2025.netlify.app/Images/Members/S3.png" 
+      },
+      { 
+        name: "Diksha Anand", 
+        role: "Lead ",
+        image: "https://rtime2025.netlify.app/Images/Members/S5.jpg" 
+      },
+      { 
+        name: "Akash Kumar", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1768435200&v=beta&t=nAUxDYR_dJuZ2mC3acIsH5RldJcXUbr72Ng3-CW8iH0" 
+      },
+      { 
+        name: "Sneh Mittal", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D4D03AQHOkbWZW1cXhw/profile-displayphoto-scale_400_400/B4DZjIjPtTG8Ag-/0/1755711342014?e=1768435200&v=beta&t=qUDMRL6i_0Ou-B26ZdrY71WvliVkAcm2Mx2Q3XpX1iM" 
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: "Community of Cybersecurity & Blockchain",
+    description: "A community focused on digital security, exploring how to defend systems from attacks (Cybersecurity) and how to build decentralized, tamper-proof applications (Blockchain/Web3).",
+    activities: [
+      "Capture The Flag (CTF) challenges",
+      "Network Penetration Testing workshops",
+      "Blockchain Fundamentals & Cryptography",
+      "Smart Contract Development (Solidity)"
+    ],
+    technologies: [
+      { name: "Kali Linux", color: "text-red-400 border-red-400" },
+      { name: "Solidity", color: "text-gray-400 border-gray-400" },
+      { name: "Ethereum/Polygon", color: "text-purple-400 border-purple-400" },
+      { name: "Networking tools (Wireshark)", color: "text-blue-400 border-blue-400" }
+    ],
+    projects: ["Decentralized Voting System", "Basic Threat Analysis Tool", "Secure Chat Application Prototype"],
+    heads: [
+      { 
+        name: "Gauri", 
+        role: "Lead ",
+        image: "https://rtime2025.netlify.app/Images/Members/s10.jpg" 
+      },
+      { 
+        name: "Kundan Saw", 
+        role: "Lead",
+        image: "https://rtime2025.netlify.app/Images/Members/kundan.jpg" 
+      },
+      { 
+        name: "Damodar Das Chaurasia", 
+        role: "Core Team ",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGLCxhOqT8zZw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725464826423?e=1768435200&v=beta&t=Iv4Ssqhugk4NwYn7K7UVeqgEChZq9Bci_3A1r0e4W8A" 
+      },
+      { 
+        name: "Anubhav kumar", 
+        role: "Core Team ",
+        image: "https://ui-avatars.com/api/?name=Anubhav+kumar&background=FFD700&color=0a0a0a&size=128&font-size=0.4" 
+      },
+      
+    ]
+  },
+  {
+    id: 5,
+    title: "Community of Electronics & Automation",
+    description: "Bridging the physical and digital worlds, this community focuses on Internet of Things (IoT), Robotics, and industrial automation using microcontrollers, sensors, and actuator systems.",
+    activities: [
+      "IoT Sensor Interfacing Workshops (Arduino/ESP32)",
+      "Robotics and Mechanism Design",
+      "Embedded C/C++ Programming",
+      "Home Automation and Smart Systems projects"
+    ],
+    technologies: [
+      { name: "Arduino/Raspberry Pi", color: "text-teal-400 border-teal-400" },
+      { name: "Embedded C", color: "text-blue-400 border-blue-400" },
+      { name: "IoT Platforms (Firebase/Adafruit)", color: "text-orange-400 border-orange-400" },
+      { name: "Circuit Design", color: "text-yellow-400 border-yellow-400" }
+    ],
+    projects: ["Smart Attendance System (RFID)", "Autonomous Line Follower Robot", "Weather Station using ESP32"],
+    heads: [
+      { 
+        name: "Siddharthaa Srivastava", 
+        role: "Lead ",
+        image: "https://rtime2025.netlify.app/Images/Members/S6.jpg" 
+      },
+      { 
+        name: "Kumar Sushant Raj", 
+        role: "Core Team ",
+        image: "https://media.licdn.com/dms/image/v2/D4D03AQHb1O29XbdY0Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1726283470624?e=1768435200&v=beta&t=RQ0ZG4zl_-Wnatg1ONPq7H8p93CBM2vUjt02Zj0byKY" 
+      },
+      { 
+        name: "Phulkeshwar Mahto", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D4E03AQHupau3fouZhw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725889078850?e=1768435200&v=beta&t=7dGkW5_PlP-TBkElYtxkwdVJvGTw-gv7zTcY8ZIeMjE" 
+      },
+      
+    ]
+  }
+];
+
+// =========================================
+// COMPONENT: Single Community Card
+// =========================================
+const CommunityCard = ({ community }) => {
+  return (
+    <section className="mb-16 p-8 border border-white/10 bg-black/40 rounded-2xl backdrop-blur-sm hover:border-forge-yellow/50 transition-colors shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+      {/* Title */}
+      <h3 className="text-3xl md:text-4xl font-black text-forge-yellow  mb-6 flex items-center border-b border-white/10 pb-4">
+        <span className="mr-4 opacity-50 text-2xl font-mono">{community.id.toString().padStart(2, '0')}.</span> {community.title}
+      </h3>
+
+      {/* Description */}
+      <p className="text-gray-300 mb-8 text-lg leading-relaxed font-sans">
+        {community.description}
+      </p>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        {/* Left Column: Activities */}
+        <div>
+          <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider flex items-center">
+            <span className="text-forge-yellow mr-2"></span> Activities & Focus
+          </h3>
+          <ul className="space-y-3 text-gray-400 font-sans">
+            {community.activities.map((activity, index) => (
+              <li key={index} className="flex items-start">
+                 <span className="text-forge-yellow/70 mr-2 mt-1">▪</span> {activity}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Right Column: Tech & Projects */}
+        <div>
+          <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider flex items-center">
+             <span className="text-forge-yellow mr-2"></span> Core Stack
+          </h3>
+          <div className="flex flex-wrap gap-3 mb-8">
+            {community.technologies.map((tech, index) => (
+              <span key={index} className={`px-3 py-1 text-sm font-mono border rounded-full bg-black/50 backdrop-blur-md shadow-sm ${tech.color}`}>
+                {tech.name}
+              </span>
+            ))}
+          </div>
+
+          <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider flex items-center">
+             <span className="text-forge-yellow mr-2"></span> Projects Highlight
+          </h3>
+          <div className="text-gray-400 font-sans space-y-2">
+            {community.projects.map((project, index) => (
+              <div key={index} className="flex items-center">
+                <svg className="w-4 h-4 text-forge-yellow mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                {project}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Community Heads - UPDATED UI FOR PHOTOS */}
+      <div className="border-t border-white/10 pt-8">
+        <h3 className="text-xl font-bold text-white mb-8 uppercase tracking-wider text-center">
+           <span className="text-forge-yellow"></span> Community Heads
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {community.heads.map((head, index) => (
+            <div key={index} className="p-4 border border-white/5 bg-white/5 rounded-xl text-center flex flex-col items-center group hover:border-forge-yellow/40 hover:bg-black/60 transition-all duration-300">
+              
+              {/* UPDATED: Image Container */}
+              <div className="w-20 h-20 mb-4 rounded-full border-2 border-forge-yellow/30 p-0.5 group-hover:border-forge-yellow transition-all group-hover:shadow-[0_0_10px_rgba(255,215,0,0.4)]">
+                <img 
+                  src={head.image} 
+                  alt={head.name} 
+                  className="w-full h-full rounded-full object-cover  group-hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+              
+              <h4 className="text-lg font-bold text-white group-hover:text-forge-yellow transition-colors">{head.name}</h4>
+              <p className="text-xs text-gray-400 font-mono uppercase mt-1">{head.role}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// =========================================
+// MAIN COMPONENT: Communities Page
+// =========================================
+const Communities = () => {
+  return (
+    <div className="min-h-screen bg-forge-dark bg-dot-pattern pt-28 pb-12 px-4 md:px-12 font-mono text-white">
+      
+      {/* Page Header */}
+      <div className="max-w-4xl mx-auto text-center mb-16">
+        <div className="inline-block px-3 py-1 mb-4 border border-forge-yellow rounded-full bg-forge-yellow/10 text-forge-yellow text-sm font-bold tracking-widest">
+            DOMAINS & SPECIALIZATIONS
+        </div>
+        <h1 className="text-4xl md:text-7xl font-black text-white  mb-6">
+          &lt;Our Communities&gt;
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto font-sans">
+          Discover your passion, build your skills, and lead the future in one of our specialized technical domains.
+        </p>
+      </div>
+
+      {/* Communities List */}
+      <div className="max-w-6xl mx-auto">
+        {communitiesData.map((community) => (
+          <CommunityCard key={community.id} community={community} />
+        ))}
+      </div>
+
+      {/* Back to Home Link */}
+      <div className="text-center mt-16 pt-8 border-t border-white/10">
+        <Link to="/">
+            <button className="px-8 py-3 text-sm font-bold text-black bg-forge-yellow rounded hover:bg-yellow-400 transition-colors font-mono shadow-[0_0_15px_rgba(255,215,0,0.4)]">
+                [ Return to Main Terminal ]
+            </button>
+        </Link>
+      </div>
+
+    </div>
+  );
+};
+
+export default Communities;
