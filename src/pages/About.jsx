@@ -51,6 +51,11 @@ const About = () => {
         </p>
         <p className="mt-4 text-gray-400">
           Official Coding Club of NIAMT, Ranchi. Established 2024.
+          Code Forge is the official Computer Society of the National Institute of Advanced Manufacturing Technology (NIAMT), Ranchi (formerly NIFFT),Established in 2024 under the Electronics and Computer Engineering Department.
+
+The society aims to foster a strong technical culture on campus by promoting coding, innovation, problem-solving, and industry-relevant skills among students. Code Forge regularly organizes technical events, workshops, hackathons, competitions, and expert sessions, creating a bridge between academic learning and real-world applications.
+
+To strengthen core technical foundations, Code Forge is also launching regular skill-development classes for 1st and 2nd year students, focusing on essential tools, technologies, and career-oriented skills
         </p>
       </div>
 
