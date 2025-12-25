@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+// IMPORT YOUR MODAL COMPONENT (Make sure you created this file from the previous step)
+import RegisterModal from './RegisterModel'; 
 
 // =========================================
 // DATA: Upcoming & Past Events
@@ -15,7 +17,7 @@ const upcomingEvents = [
     venue: "NIAMT Auditorium",
     description: "Calling all 1st Years! Join us for the grand unveiling of Code Forge. Meet the mentors, explore our 5 domains, and start your tech journey.",
     image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-    link: "#"
+    // Link is removed here because we handle it with the button now
   },
   {
     id: 2,
@@ -25,7 +27,6 @@ const upcomingEvents = [
     venue: "Lecture Hall 1",
     description: "The first session of our weekly Full-Stack Development series. We start with HTML5 structure and modern CSS Grid layouts.",
     image: "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&auto=format&fit=crop&w=1664&q=80",
-    link: "#"
   },
   {
     id: 3,
@@ -35,7 +36,6 @@ const upcomingEvents = [
     venue: "Lecture Hall 1",
     description: "Kickstarting the AI track! Hands-on workshop on Python libraries (NumPy, Pandas) essential for building intelligent systems.",
     image: "https://images.unsplash.com/photo-1555255707-c07966088b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-    link: "#"
   },
   {
     id: 4,
@@ -45,7 +45,6 @@ const upcomingEvents = [
     venue: "Lecture Hall 1",
     description: "Week 1 of the Ethical Hacking roadmap. Learn to navigate the Kali Linux terminal and understand network protocols.",
     image: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-    link: "#"
   },
   {
     id: 5,
@@ -55,7 +54,6 @@ const upcomingEvents = [
     venue: "Electronics Lab",
     description: "First step into hardware automation. Learn to interface sensors and actuators with Arduino microcontrollers.",
     image: "https://images.unsplash.com/photo-1553406830-ef2513450d76?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-    link: "#"
   }
 ];
 
@@ -125,19 +123,19 @@ const sliderSettings = {
   arrows: false,
   responsive: [
     {
-      breakpoint: 1024, // Tablet: Show 1 slide
+      breakpoint: 1024,
       settings: {
         slidesToShow: 1,
         slidesToScroll: 1,
       }
     },
     {
-      breakpoint: 640, // Mobile: Show 1 slide, adjusted scrolling
+      breakpoint: 640,
       settings: {
         slidesToShow: 1,
         slidesToScroll: 1,
-        dots: true, // Keep dots for navigation since arrows are hidden
-        autoplaySpeed: 3000 // Slightly faster scroll on mobile
+        dots: true,
+        autoplaySpeed: 3000
       }
     }
   ],
@@ -154,7 +152,8 @@ const sliderSettings = {
 // =========================================
 // COMPONENT: Single Upcoming Event Card
 // =========================================
-const UpcomingEventCard = ({ event }) => {
+// ADDED: onRegister Prop
+const UpcomingEventCard = ({ event, onRegister }) => {
   return (
     <div className="p-2 md:p-4 h-full">
       <div className="flex flex-col lg:flex-row h-full border border-white/10 bg-black/40 rounded-xl md:rounded-2xl overflow-hidden backdrop-blur-sm hover:border-forge-yellow/50 transition-all hover:shadow-[0_0_15px_rgba(255,215,0,0.15)] group">
@@ -180,9 +179,14 @@ const UpcomingEventCard = ({ event }) => {
               {event.description}
             </p>
           </div>
-          <a href={event.link} className="inline-block text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-black bg-forge-yellow rounded hover:bg-orange-400 transition-colors font-mono shadow-[0_0_10px_rgba(255,215,0,0.3)]">
+          
+          {/* UPDATED: Button calls onRegister instead of linking somewhere */}
+          <button 
+            onClick={() => onRegister(event.title)}
+            className="inline-block text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-black bg-forge-yellow rounded hover:bg-orange-400 transition-colors font-mono shadow-[0_0_10px_rgba(255,215,0,0.3)] cursor-pointer"
+          >
             Register Now
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -213,8 +217,27 @@ const GalleryCard = ({ event }) => {
 // MAIN COMPONENT: Events Section
 // =========================================
 const EventsSection = () => {
+  // 1. State for Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState("");
+
+  // 2. Function to handle opening the modal
+  const handleRegister = (eventName) => {
+    setSelectedEvent(eventName);
+    setIsModalOpen(true);
+  };
+
   return (
     <section className="py-12 md:py-20 px-4 md:px-12 bg-forge-dark bg-dot-pattern font-mono overflow-hidden">
+      
+      {/* 3. Render Modal if Open */}
+      {isModalOpen && (
+        <RegisterModal 
+          eventName={selectedEvent} 
+          onClose={() => setIsModalOpen(false)} 
+        />
+      )}
+
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* 1. Upcoming Events Slider */}
@@ -222,11 +245,14 @@ const EventsSection = () => {
           <h2 className="text-2xl md:text-4xl font-black text-white mb-8 md:mb-12 pb-2 md:pb-4 border-b-2 border-forge-yellow inline-block">
             Upcoming Events
           </h2>
-          {/* Using negative margins to counteract the padding in the cards for perfect alignment */}
           <div className="-mx-2 md:-mx-4">
             <Slider {...sliderSettings}>
               {upcomingEvents.map(event => (
-                <UpcomingEventCard key={event.id} event={event} />
+                <UpcomingEventCard 
+                   key={event.id} 
+                   event={event} 
+                   onRegister={handleRegister} // Pass the handler
+                />
               ))}
             </Slider>
           </div>

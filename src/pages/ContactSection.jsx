@@ -1,6 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ContactSection = () => {
+  // 1. State to store input values
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
+
+  // State to show success/error messages
+  const [status, setStatus] = useState("");
+
+  // 2. Function to handle typing
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // 3. Function to send data to Netlify
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Stop page from reloading
+    setStatus("Sending...");
+
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        "form-name": "contact", // This must match the hidden form name in index.html
+        ...formData
+      }).toString(),
+    })
+      .then(() => {
+        setStatus("Message Sent! We will get back to you shortly.");
+        setFormData({ name: "", email: "", message: "" }); // Clear the form
+      })
+      .catch((error) => {
+        console.error("Form Error:", error);
+        setStatus("Error sending message. Please try again.");
+      });
+  };
+
   return (
     <section id="contact" className="py-20 px-4 md:px-12 bg-forge-dark border-t border-white/5 font-mono">
       <div className="max-w-7xl mx-auto">
@@ -63,25 +104,62 @@ const ContactSection = () => {
              
              <h3 className="text-2xl font-bold text-white mb-6">Send a Message_</h3>
              
-             <form className="space-y-6">
+             {/* Added onSubmit handler */}
+             <form onSubmit={handleSubmit} className="space-y-6">
+                
+                {/* REQUIRED: Hidden input for Netlify detection */}
+                <input type="hidden" name="form-name" value="contact" />
+
                 <div>
                   <label className="block text-forge-yellow text-sm mb-2 font-bold">&gt; Name</label>
-                  <input type="text" placeholder="Enter your name" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-forge-yellow focus:ring-1 focus:ring-forge-yellow transition-colors placeholder-gray-600" />
+                  <input 
+                    type="text" 
+                    name="name" // Important: matches state key
+                    value={formData.name} // Controlled component
+                    onChange={handleChange}
+                    required // Makes it mandatory
+                    placeholder="Enter your name" 
+                    className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-forge-yellow focus:ring-1 focus:ring-forge-yellow transition-colors placeholder-gray-600" 
+                  />
                 </div>
 
                 <div>
                   <label className="block text-forge-yellow text-sm mb-2 font-bold">&gt; Email </label>
-                  <input type="email" placeholder="name@example.com" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-forge-yellow focus:ring-1 focus:ring-forge-yellow transition-colors placeholder-gray-600" />
+                  <input 
+                    type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="name@example.com" 
+                    className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-forge-yellow focus:ring-1 focus:ring-forge-yellow transition-colors placeholder-gray-600" 
+                  />
                 </div>
 
                 <div>
                   <label className="block text-forge-yellow text-sm mb-2 font-bold">&gt; Message</label>
-                  <textarea rows="4" placeholder="Type your message here..." className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-forge-yellow focus:ring-1 focus:ring-forge-yellow transition-colors placeholder-gray-600"></textarea>
+                  <textarea 
+                    rows="4" 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    placeholder="Type your message here..." 
+                    className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-forge-yellow focus:ring-1 focus:ring-forge-yellow transition-colors placeholder-gray-600"
+                  ></textarea>
                 </div>
 
-                <button type="button" className="w-full py-3 bg-forge-yellow text-black font-bold rounded hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(255,215,0,0.3)]">
+                {/* Changed type="button" to type="submit" */}
+                <button type="submit" className="w-full py-3 bg-forge-yellow text-black font-bold rounded hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(255,215,0,0.3)]">
                   [ Submit Message ]
                 </button>
+
+                {/* Status Message Display */}
+                {status && (
+                  <p className={`text-center mt-4 text-sm font-bold ${status.includes("Error") ? "text-red-400" : "text-green-400 animate-pulse"}`}>
+                    {status}
+                  </p>
+                )}
              </form>
           </div>
 
