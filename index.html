@@ -2,26 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/public/code.jpg" />
+    <link rel="icon" type="image/svg+xml" href="/code.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>codeforge</title>
   </head>
   <body>
-    <!-- new -->
-    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
-  <input type="text" name="name" />
-  <input type="email" name="email" />
-  <textarea name="message"></textarea>
-</form>
+    
+    <form name="contact" netlify hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+    </form>
 
-<form name="event-registration" netlify netlify-honeypot="bot-field" hidden>
-  <input type="text" name="name" />
-  <input type="email" name="email" />
-  <input type="text" name="phone" />
-  <input type="text" name="eventName" /> <input type="text" name="year" />
-  <input type="text" name="branch" />
-</form>
- <!-- new -->
+    <form name="event-registration" netlify hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="text" name="phone" />
+      <input type="text" name="eventName" /> 
+      <input type="text" name="year" />
+      <input type="text" name="branch" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

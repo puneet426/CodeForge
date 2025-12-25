@@ -49,7 +49,7 @@ const RegisterModal = ({ eventName, onClose }) => {
         </button>
 
         <h2 className="text-2xl font-bold text-white mb-2">Register Event</h2>
-        <p className="text-forge-yellow font-mono text-sm mb-6">> {eventName}</p>
+        <p className="text-forge-yellow font-mono text-sm mb-6"> {eventName}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
             <input type="hidden" name="form-name" value="event-registration" />
