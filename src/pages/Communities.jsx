@@ -25,7 +25,7 @@ const communitiesData = [
       { 
         name: "Puneet Tiwari", 
         role: "Media Cell Lead",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQERwXorHIXmAg/profile-displayphoto-scale_400_400/B56Zsb17njI4Ag-/0/1765698683231?e=1768435200&v=beta&t=9g7rRf2ZxmV3yjPJWElE47CZz8ArOQsGhmWwwb3kN8s"
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767174524/ptimg2_l4owhq.jpg"
       },
       { 
         name: "Ashutosh Pandey", 
