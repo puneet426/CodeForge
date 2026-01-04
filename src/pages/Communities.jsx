@@ -33,6 +33,11 @@ const communitiesData = [
         image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766576161/WhatsApp_Image_2025-12-24_at_17.04.08_dzoohz.jpg"
       },
       { 
+        name: "Agraj Tyagi", 
+        role: "Event Management Lead",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767505022/1709112050641_c0jmcu.jpg"
+      },
+      { 
         name: "Akash Kumar", 
         role: "Core Team",
         image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1768435200&v=beta&t=nAUxDYR_dJuZ2mC3acIsH5RldJcXUbr72Ng3-CW8iH0"
@@ -98,7 +103,7 @@ const communitiesData = [
       { 
         name: "Md Danish Ali", 
         role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQGfcuU3wcKBGw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727350008622?e=1768435200&v=beta&t=ZQSZ23Rd7b0jQazBjE2uH7FDdcHBh_6GewvTVeiXBPA"
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767504905/1767194949477_kitajz.jpg"
       }
     ]
   },
@@ -139,6 +144,11 @@ const communitiesData = [
         name: "Sneh Mittal", 
         role: "Core Team",
         image: "https://media.licdn.com/dms/image/v2/D4D03AQHOkbWZW1cXhw/profile-displayphoto-scale_400_400/B4DZjIjPtTG8Ag-/0/1755711342014?e=1768435200&v=beta&t=qUDMRL6i_0Ou-B26ZdrY71WvliVkAcm2Mx2Q3XpX1iM" 
+      },
+      { 
+        name: "Abhishek Sinha", 
+        role: "Core Team",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767505141/1766738094366_ryeitj.jpg" 
       }
     ]
   },
@@ -178,7 +188,7 @@ const communitiesData = [
       { 
         name: "Anubhav kumar", 
         role: "Core Team ",
-        image: "https://ui-avatars.com/api/?name=Anubhav+kumar&background=FFD700&color=0a0a0a&size=128&font-size=0.4" 
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767504784/WhatsApp_Image_2026-01-04_at_07.44.34_qwiqs3.jpg" 
       },
       
     ]
@@ -205,6 +215,11 @@ const communitiesData = [
         name: "Siddharthaa Srivastava", 
         role: "Lead ",
         image: "https://rtime2025.netlify.app/Images/Members/S6.jpg" 
+      },
+      { 
+        name: "Pawan Kumar", 
+        role: "Lead ",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767504856/WhatsApp_Image_2026-01-03_at_20.40.36_lqlwvy.jpg" 
       },
       { 
         name: "Kumar Sushant Raj", 
