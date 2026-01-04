@@ -60,7 +60,7 @@ const communitiesData = [
       { 
         name: "Abhishek Kumar", 
         role: "Core Team",
-        image: "https://ui-avatars.com/api/?name=Abhishek+Kumar&background=FFD700&color=0a0a0a&size=128&font-size=0.4"
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767505463/WhatsApp_Image_2026-01-03_at_18.23.29_vm5ium.jpg"
       },
     ]
   },
