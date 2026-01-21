@@ -34,13 +34,13 @@ const communitiesData = [
       },
       { 
         name: "Agraj Tyagi", 
-        role: "Event Management Lead",
+        role: "Event Management Co-Lead",
         image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767505022/1709112050641_c0jmcu.jpg"
       },
       { 
         name: "Akash Kumar", 
         role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1768435200&v=beta&t=nAUxDYR_dJuZ2mC3acIsH5RldJcXUbr72Ng3-CW8iH0"
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1770854400&v=beta&t=TORzJnuU_466BWcnls6PioUS3XGcZvkAlC6fcPWziiI"
       },
       { 
         name: "Wartika Narayan", 
@@ -50,7 +50,7 @@ const communitiesData = [
       { 
         name: "Devika Suresh", 
         role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D4D03AQG9T2Ct2z5xnw/profile-displayphoto-scale_400_400/B4DZf583cKG8Ag-/0/1752245175403?e=1768435200&v=beta&t=egQdW7xXMwmWnYq019J5bpBNiSKdbWCt7g36-4xDioc"
+        image: "https://media.licdn.com/dms/image/v2/D4D03AQG9T2Ct2z5xnw/profile-displayphoto-scale_400_400/B4DZf583cKG8Ag-/0/1752245175403?e=1770854400&v=beta&t=fAuvoSx-Z6tzEKGccsFCahEhaBH6hYmIGe8i2mVouLs"
       },
       { 
         name: "Priya Kumari", 
@@ -87,18 +87,18 @@ const communitiesData = [
     heads: [
       { 
         name: "Rohit Raj", 
-        role: "Competitive Programming Lead",
-        image: "https://media.licdn.com/dms/image/v2/D4E03AQG9CjmmcdEfqA/profile-displayphoto-scale_400_400/B4EZnd_m3iKcAg-/0/1760366066064?e=1768435200&v=beta&t=IXFWf6cQfoChOnbjgWgLQFle1rC-NebXPnLxfErlQS0"
+        role: " Lead",
+        image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1768989297/WhatsApp_Image_2025-10-30_at_15.38.18_t4q8jo.jpg"
       },
       { 
         name: "Rana Poddar", 
-        role: "Web Development Lead",
+        role: "Co-Lead",
         image: "https://rtime2025.netlify.app/Images/Members/S9.jpg"
       },
       { 
         name: "Prince Kumar", 
         role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQED7tX9tKvTmQ/profile-displayphoto-shrink_400_400/B56ZeHh4EnG0Ak-/0/1750325513885?e=1768435200&v=beta&t=hX2gFeBBFp4bYebvF0gzjzZ5c2HFrEc3pF9Cnbvb0e4"
+        image: "https://media.licdn.com/dms/image/v2/D5603AQED7tX9tKvTmQ/profile-displayphoto-shrink_400_400/B56ZeHh4EnG0Ak-/0/1750325513885?e=1770854400&v=beta&t=e2c9607V3Ff_c1YcRIy7U73hKtUfZSKWO0GzPxCSHpQ"
       },
       { 
         name: "Md Danish Ali", 
@@ -138,13 +138,9 @@ const communitiesData = [
       { 
         name: "Akash Kumar", 
         role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1768435200&v=beta&t=nAUxDYR_dJuZ2mC3acIsH5RldJcXUbr72Ng3-CW8iH0" 
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1770854400&v=beta&t=TORzJnuU_466BWcnls6PioUS3XGcZvkAlC6fcPWziiI" 
       },
-      { 
-        name: "Sneh Mittal", 
-        role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D4D03AQHOkbWZW1cXhw/profile-displayphoto-scale_400_400/B4DZjIjPtTG8Ag-/0/1755711342014?e=1768435200&v=beta&t=qUDMRL6i_0Ou-B26ZdrY71WvliVkAcm2Mx2Q3XpX1iM" 
-      },
+     
       { 
         name: "Abhishek Sinha", 
         role: "Core Team",
@@ -183,7 +179,7 @@ const communitiesData = [
       { 
         name: "Damodar Das Chaurasia", 
         role: "Core Team ",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQGLCxhOqT8zZw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725464826423?e=1768435200&v=beta&t=Iv4Ssqhugk4NwYn7K7UVeqgEChZq9Bci_3A1r0e4W8A" 
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGLCxhOqT8zZw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725464826423?e=1770854400&v=beta&t=2aKr3bw5PV6ptA2JIpTMrQoBTO1reDxj7b35_PINL1s" 
       },
       { 
         name: "Anubhav kumar", 
@@ -224,12 +220,12 @@ const communitiesData = [
       { 
         name: "Kumar Sushant Raj", 
         role: "Core Team ",
-        image: "https://media.licdn.com/dms/image/v2/D4D03AQHb1O29XbdY0Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1726283470624?e=1768435200&v=beta&t=RQ0ZG4zl_-Wnatg1ONPq7H8p93CBM2vUjt02Zj0byKY" 
+        image: "https://media.licdn.com/dms/image/v2/D4D03AQHb1O29XbdY0Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1726283470624?e=1770854400&v=beta&t=nr75yReP1zqsvXWCsClCPY5Bgjw0rQ6DlSwkXeDCVKk" 
       },
       { 
         name: "Phulkeshwar Mahto", 
         role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D4E03AQHupau3fouZhw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725889078850?e=1768435200&v=beta&t=7dGkW5_PlP-TBkElYtxkwdVJvGTw-gv7zTcY8ZIeMjE" 
+        image: "https://media.licdn.com/dms/image/v2/D4E03AQHupau3fouZhw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1725889078884?e=1770854400&v=beta&t=8-Ol727LQXi-iLfeYdTz97ZwUkiZXmYcYn8WKMxCEzE" 
       },
       
     ]
