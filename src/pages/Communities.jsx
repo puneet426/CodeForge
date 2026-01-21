@@ -173,7 +173,7 @@ const communitiesData = [
       },
       { 
         name: "Kundan Saw", 
-        role: "Lead",
+        role: "Co-Lead",
         image: "https://rtime2025.netlify.app/Images/Members/kundan.jpg" 
       },
       { 
@@ -214,7 +214,7 @@ const communitiesData = [
       },
       { 
         name: "Pawan Kumar", 
-        role: "Lead ",
+        role: "Co-Lead ",
         image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767504856/WhatsApp_Image_2026-01-03_at_20.40.36_lqlwvy.jpg" 
       },
       { 
