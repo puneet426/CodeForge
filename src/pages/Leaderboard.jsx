@@ -66,7 +66,7 @@ const Leaderboard = () => {
         
         {/* === Rank 2 (Left - Silver) === */}
         {topThree[1] && (
-          <div className="flex-1 flex flex-col items-center bg-black/40 border border-gray-500/30 rounded-t-2xl md:rounded-t-3xl p-4 pb-0 backdrop-blur-sm z-10">
+          <div className="flex-1 flex flex-col items-center bg-black/40 border border-gray-500/30 rounded-t-2xl md:rounded-t-3xl p-4 pb-0 backdrop-blur-sm z-10 shadow-[0_-5px_30px_rgba(192,192,192,0.4)]">
             {/* Avatar Container */}
             <div className="relative mb-3">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gray-300 overflow-hidden shadow-[0_0_15px_rgba(192,192,192,0.4)]">
@@ -110,10 +110,10 @@ const Leaderboard = () => {
 
         {/* === Rank 3 (Right - Bronze) === */}
         {topThree[2] && (
-          <div className="flex-1 flex flex-col items-center bg-black/40 border border-orange-700/30 rounded-t-2xl md:rounded-t-3xl p-4 pb-0 backdrop-blur-sm z-10">
+          <div className="flex-1 flex flex-col items-center bg-black/40 border border-stone-400/30 rounded-t-2xl md:rounded-t-3xl p-4 pb-0 backdrop-blur-sm z-10 shadow-[0_-5px_30px_rgba(87,83,78,0.5)]">
              {/* Avatar Container */}
             <div className="relative mb-3">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-stone-600 overflow-hidden shadow-[0_0_15px_rgba(205,127,50,0.4)]">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-stone-600 overflow-hidden shadow-[0_0_15px_rgba(87, 83, 78,0.5)]">
                 <img src={topThree[2].avatarUrl} alt={topThree[2].Name} className="w-full h-full object-cover" />
               </div>
                {/* Rank Badge */}

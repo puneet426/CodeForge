@@ -22,13 +22,12 @@ const Navbar = () => {
         <Link to ="/communities" className="hover:text-forge-yellow transition-colors">Communities</Link>
         <Link to="/events" className="hover:text-forge-yellow transition-colors">Events</Link>
         <Link to="/contact" className="hover:text-forge-yellow transition-colors">Contact US</Link>
-        <Link to="/Leaderboard" className="hover:text-forge-yellow transition-colors">Leaderboard</Link>
+        
       </div>
 
       <div>
-        <a href='https://chat.whatsapp.com/BlBNJT7f9XqC7s23myGI5k' className="px-4 py-2 text-sm font-bold text-black bg-forge-yellow rounded hover:bg-orange-400 transition-colors font-mono cursor-pointer shadow-[0_0_15px_rgba(255,215,0,0.4)]">
-          Join Club
-        </a>
+       
+        <Link to="/leaderboard" className="px-4 py-2 text-sm font-bold text-black bg-forge-yellow rounded hover:bg-orange-400 transition-colors font-mono cursor-pointer shadow-[0_0_15px_rgba(255,215,0,0.4)]">Leaderboard</Link>
       </div>
     </nav>
   );
