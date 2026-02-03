@@ -22,6 +22,7 @@ const Navbar = () => {
         <Link to ="/communities" className="hover:text-forge-yellow transition-colors">Communities</Link>
         <Link to="/events" className="hover:text-forge-yellow transition-colors">Events</Link>
         <Link to="/contact" className="hover:text-forge-yellow transition-colors">Contact US</Link>
+        <Link to="/Leaderboard" className="hover:text-forge-yellow transition-colors">Leaderboard</Link>
       </div>
 
       <div>

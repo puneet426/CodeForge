@@ -5,6 +5,7 @@ import HeroSection from './components/HeroSection';
 import About from './pages/About';
 import Communities from './pages/Communities'; // 1. Import the new page
 import EventsSection from './pages/EventsSection';
+import Leaderboard from './pages/Leaderboard';
 
 import Footer from './components/Footer';
 import Guidelines from './pages/Guidelines';
@@ -23,6 +24,7 @@ function App() {
           <Route path="/events" element={<EventsSection/>} />
           <Route path="/contact" element={<ContactSection/>} />
           <Route path="/guidelines" element={<Guidelines/>} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           
         </Routes>
         
