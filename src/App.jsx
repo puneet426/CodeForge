@@ -19,7 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/about" element={<About />} />
-          {/* 2. Add the new route */}
+
           <Route path="/communities" element={<Communities />} />
           <Route path="/events" element={<EventsSection/>} />
           <Route path="/contact" element={<ContactSection/>} />

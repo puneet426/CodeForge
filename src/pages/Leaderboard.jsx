@@ -4,9 +4,9 @@ const Leaderboard = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // REPLACE WITH YOUR ACTUAL GOOGLE SHEET ID
+  
   const SHEET_ID = "1EuuFzU6CCENRwWUDgAKnpLs-07TgVq8Yaazs27gmJTI";
-  // REPLACE WITH THE EXACT NAME OF YOUR SHEET TAB
+  
   const SHEET_NAME = "Leaderboard"; 
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const Leaderboard = () => {
 
   if (loading) return <div className="min-h-screen bg-forge-dark flex items-center justify-center text-forge-yellow font-mono animate-pulse">Loading Scores...</div>;
 
-  // Slice top 3 and the rest
+  
   const topThree = [students[0], students[1], students[2]]; // Ensure array exists even if empty
   const restList = students.slice(3);
 
@@ -60,8 +60,7 @@ const Leaderboard = () => {
         </p>
       </div>
 
-      {/* ================= NEW PODIUM SECTION (Top 3) ================= */}
-      {/* items-end aligns them at the bottom to create steps */}
+      
       <div className="flex justify-center items-end gap-4 md:gap-8 mb-16 max-w-3xl mx-auto">
         
         {/* === Rank 2 (Left - Silver) === */}
@@ -84,7 +83,7 @@ const Leaderboard = () => {
           </div>
         )}
 
-        {/* === Rank 1 (Center - Gold - Biggest) === */}
+        
         {topThree[0] && (
           // Taller container (-mt-12), higher z-index, prominent yellow border
           <div className="flex-1 flex flex-col items-center bg-black/40 border border-forge-yellow/40 rounded-t-2xl md:rounded-t-[40px] p-4 pb-0 backdrop-blur-sm -mt-12 z-20 shadow-[0_-5px_30px_rgba(255,215,0,0.2)]">
@@ -108,7 +107,7 @@ const Leaderboard = () => {
           </div>
         )}
 
-        {/* === Rank 3 (Right - Bronze) === */}
+        
         {topThree[2] && (
           <div className="flex-1 flex flex-col items-center bg-black/40 border border-stone-400/30 rounded-t-2xl md:rounded-t-3xl p-4 pb-0 backdrop-blur-sm z-10 shadow-[0_-5px_30px_rgba(87,83,78,0.5)]">
              {/* Avatar Container */}
@@ -130,7 +129,7 @@ const Leaderboard = () => {
 
       </div>
 
-      {/* ================= LIST SECTION (Rank 4+) ================= */}
+      
       <div className="max-w-3xl mx-auto bg-black/30 rounded-xl border border-white/10 overflow-hidden backdrop-blur-sm">
         {/* Header */}
         <div className="grid grid-cols-12 gap-2 p-4 border-b border-white/10 text-gray-500 text-xs md:text-sm uppercase font-bold tracking-wider">
@@ -139,7 +138,7 @@ const Leaderboard = () => {
           <div className="col-span-3 text-right">Score</div>
         </div>
 
-        {/* List Items */}
+       
         {restList.length > 0 ? (
           restList.map((student) => (
             <div key={student.Github_Username || student.rank} className="grid grid-cols-12 gap-2 p-4 items-center border-b border-white/5 hover:bg-white/5 transition-colors">
