@@ -1,277 +1,86 @@
-import React, { useState } from 'react';
-import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-// IMPORT YOUR MODAL COMPONENT (Make sure you created this file from the previous step)
-import RegisterModal from './RegisterModel'; 
+import React, { useMemo, useState } from 'react';
+import UpcomingSpotlight from '../components/UpcomingSpotlight';
+import EventCard from '../components/EventCard';
+import EventModal from '../components/EventModal';
+import { SectionHeading, Reveal } from '../components/ui';
+import { getUpcoming, getPast, CATEGORIES } from '../data/events';
 
 // =========================================
-// DATA: Upcoming & Past Events
-// =========================================
-const upcomingEvents = [
-  {
-    id: 1,
-    title: "Freshers' Induction 2026",
-    icon: "✨",
-    date: "Jan 13, 2026",
-    venue: "NIAMT Auditorium",
-    description: "Calling all 1st Years! Join us for the grand unveiling of Code Forge. Meet the mentors, explore our 5 domains, and start your tech journey.",
-    image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-    // Link is removed here because we handle it with the button now
-  },
-  {
-    id: 2,
-    title: "Web Dev: Zero to Hero (Week 1)",
-    icon: "💻",
-    date: "Jan 17, 2026",
-    venue: "Lecture Hall 1",
-    description: "The first session of our weekly Full-Stack Development series. We start with HTML5 structure and modern CSS Grid layouts.",
-    image: "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&auto=format&fit=crop&w=1664&q=80",
-  },
-  {
-    id: 3,
-    title: "AI/ML: Python for Data Science",
-    icon: "🤖",
-    date: "Jan 18, 2026",
-    venue: "Lecture Hall 1",
-    description: "Kickstarting the AI track! Hands-on workshop on Python libraries (NumPy, Pandas) essential for building intelligent systems.",
-    image: "https://images.unsplash.com/photo-1555255707-c07966088b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-  },
-  {
-    id: 4,
-    title: "Cybersec: Linux & Networking",
-    icon: "🔒",
-    date: "Jan 24, 2026",
-    venue: "Lecture Hall 1",
-    description: "Week 1 of the Ethical Hacking roadmap. Learn to navigate the Kali Linux terminal and understand network protocols.",
-    image: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-  },
-  {
-    id: 5,
-    title: "IoT: Arduino Basics",
-    icon: "🔌",
-    date: "Jan 25, 2026",
-    venue: "Electronics Lab",
-    description: "First step into hardware automation. Learn to interface sensors and actuators with Arduino microcontrollers.",
-    image: "https://images.unsplash.com/photo-1553406830-ef2513450d76?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-  }
-];
-
-const pastEvents = [
-  {
-    id: 1,
-    title: "rTIME-2025",
-    date: "December 2025",
-    image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766561082/Untitled_design_18_xt1stb.png"
-  },
-  {
-    id: 2,
-    title: "Workshop on C Programming",
-    date: "November 2025",
-    image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766561582/Untitled_design_19_qsgpvx.png"
-  },
-  {
-    id: 3,
-    title: "5-Day Cyber Security Workshop",
-    date: " Oct 2025",
-    image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766563498/code_forge_website_designs_qwiknb.png"
-  },
-  {
-    id: 4,
-    title: "SIH-2025",
-    date: "Oct 2025",
-    image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766564063/Internal_SIH_OCT_2025_Landscape_1_tlrtgn.png"
-  },
-  {
-    id: 5,
-    title: "TECH TALK",
-    date: "July 2025",
-    image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1766582739/code_forge_website_designs_1_nftss4.png"
-  },
-  {
-    id: 6,
-    title: "TECH TALK",
-    date: "April 2025",
-    image: "https://media.licdn.com/dms/image/v2/D4D22AQH_bmmpqsc6CA/feedshare-shrink_2048_1536/B4DZY.PIs6HsAo-/0/1744801032002?e=1768435200&v=beta&t=SJqgZ7uEaTTNi_EZK6l-QyaDPyoR28nUVpY7VGmQXrc"
-  },
-  {
-    id: 7,
-    title: "Kartavya Tech Event x <Code/Forge>",
-    date: "March 2025",
-    image: "https://media.licdn.com/dms/image/v2/D4E22AQHlCWDGXKDipA/feedshare-shrink_800/B4EZVyZD8EHMAo-/0/1741380928441?e=1768435200&v=beta&t=VgbfLCgRRoeL2GQhPOVxldnfIZxppXoZcl4ngiyP5kc"
-  },
-  {
-    id: 8,
-    title: "TECH TALK",
-    date: "Feb 2025",
-    image: "https://media.licdn.com/dms/image/v2/D4D22AQGzhf1Psrsx2A/feedshare-shrink_2048_1536/B4DZUdSYYyHwA0-/0/1739953116487?e=1768435200&v=beta&t=YfU19Do_mPYU4nt_bDVHyJCCSBoNVO1dw7bDAghxyH4"
-  }
-];
-
-// =========================================
-// SLIDER SETTINGS
-// =========================================
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 2,
-  slidesToScroll: 2,
-  autoplay: true,
-  autoplaySpeed: 4000,
-  cssEase: "ease-in-out",
-  arrows: false,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-      }
-    },
-    {
-      breakpoint: 640,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        dots: true,
-        autoplaySpeed: 3000
-      }
-    }
-  ],
-  appendDots: dots => (
-    <div style={{ bottom: "-40px" }}>
-      <ul className="m-0 p-0 flex justify-center items-center"> {dots} </ul>
-    </div>
-  ),
-  customPaging: i => (
-    <div className="w-2 h-2 md:w-3 md:h-3 mx-1 rounded-full bg-gray-600 hover:bg-forge-yellow transition-colors cursor-pointer slick-active:bg-forge-yellow"></div>
-  )
-};
-
-// =========================================
-// COMPONENT: Single Upcoming Event Card
-// =========================================
-// ADDED: onRegister Prop
-const UpcomingEventCard = ({ event, onRegister }) => {
-  return (
-    <div className="p-2 md:p-4 h-full">
-      <div className="flex flex-col lg:flex-row h-full border border-white/10 bg-black/40 rounded-xl md:rounded-2xl overflow-hidden backdrop-blur-sm hover:border-forge-yellow/50 transition-all hover:shadow-[0_0_15px_rgba(255,215,0,0.15)] group">
-        
-        {/* Image Section */}
-        <div className="w-full lg:w-2/5 h-48 sm:h-56 lg:h-auto relative overflow-hidden flex-shrink-0">
-          <img src={event.image} alt={event.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent lg:bg-gradient-to-r"></div>
-        </div>
-
-        {/* Content Section */}
-        <div className="w-full lg:w-3/5 p-5 md:p-6 flex flex-col justify-between">
-          <div>
-            <h3 className="text-lg md:text-xl font-bold text-white mb-2 flex items-start">
-              <span className="mr-2 text-xl md:text-2xl">{event.icon}</span>
-              {event.title}
-            </h3>
-            <div className="flex flex-wrap text-xs md:text-sm text-forge-yellow font-mono mb-3 gap-x-4 gap-y-1">
-              <p>📅 {event.date}</p>
-              <p>📍 {event.venue}</p>
-            </div>
-            <p className="text-gray-300 text-xs md:text-sm leading-relaxed mb-4 line-clamp-3">
-              {event.description}
-            </p>
-          </div>
-          
-          {/* UPDATED: Button calls onRegister instead of linking somewhere */}
-          <button 
-            onClick={() => onRegister(event.title)}
-            className="inline-block text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-black bg-forge-yellow rounded hover:bg-orange-400 transition-colors font-mono shadow-[0_0_10px_rgba(255,215,0,0.3)] cursor-pointer"
-          >
-            Register Now
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// =========================================
-// COMPONENT: Single Past Event Gallery Card
-// =========================================
-const GalleryCard = ({ event }) => {
-  return (
-    <div className="p-2 md:p-4 h-full">
-      <div className="relative h-56 md:h-64 border border-white/10 bg-black/40 rounded-xl md:rounded-2xl overflow-hidden group hover:border-forge-yellow/50 transition-all">
-        <img src={event.image} alt={event.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
-        
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 translate-y-2 group-hover:translate-y-0 transition-transform">
-          <h3 className="text-base md:text-lg font-bold text-white mb-1 leading-tight">{event.title}</h3>
-          <p className="text-forge-yellow font-mono text-xs md:text-sm">{event.date}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// =========================================
-// MAIN COMPONENT: Events Section
+// Events page: upcoming spotlight + filterable past-events archive.
+// All data lives in src/data/events.js
 // =========================================
 const EventsSection = () => {
-  // 1. State for Modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState("");
+  const upcoming = getUpcoming();
+  const past = getPast();
+  const [filter, setFilter] = useState("All");
+  const [open, setOpen] = useState(null);
 
-  // 2. Function to handle opening the modal
-  const handleRegister = (eventName) => {
-    setSelectedEvent(eventName);
-    setIsModalOpen(true);
-  };
+  const counts = useMemo(() => {
+    const c = { All: past.length };
+    past.forEach((e) => { c[e.category] = (c[e.category] || 0) + 1; });
+    return c;
+  }, [past]);
+
+  const byYear = useMemo(() => {
+    const list = filter === "All" ? past : past.filter((e) => e.category === filter);
+    const groups = {};
+    list.forEach((e) => {
+      const y = new Date(e.start).getFullYear();
+      (groups[y] = groups[y] || []).push(e);
+    });
+    return Object.entries(groups).sort((a, b) => b[0] - a[0]);
+  }, [past, filter]);
 
   return (
-    <section className="py-12 md:py-20 px-4 md:px-12 bg-forge-dark bg-dot-pattern font-mono overflow-hidden">
-      
-      {/* 3. Render Modal if Open */}
-      {isModalOpen && (
-        <RegisterModal 
-          eventName={selectedEvent} 
-          onClose={() => setIsModalOpen(false)} 
-        />
-      )}
-
+    <section className="min-h-screen pt-28 pb-20 px-4 md:px-12 bg-forge-dark bg-dot-pattern font-mono overflow-hidden">
+      {open && <EventModal event={open} onClose={() => setOpen(null)} />}
       <div className="max-w-7xl mx-auto relative z-10">
-        
-        {/* 1. Upcoming Events Slider */}
-        <div className="mb-16 md:mb-24">
-          <h2 className="text-2xl md:text-4xl font-black text-white mb-8 md:mb-12 pb-2 md:pb-4 border-b-2 border-forge-yellow inline-block">
-            Upcoming Events
-          </h2>
-          <div className="-mx-2 md:-mx-4">
-            <Slider {...sliderSettings}>
-              {upcomingEvents.map(event => (
-                <UpcomingEventCard 
-                   key={event.id} 
-                   event={event} 
-                   onRegister={handleRegister} // Pass the handler
-                />
-              ))}
-            </Slider>
+        <div className="text-center mb-14 md:mb-20">
+          <div className="inline-block px-3 py-1 mb-4 border border-forge-yellow rounded-full bg-forge-yellow/10 text-forge-yellow text-xs md:text-sm font-bold tracking-widest">
+            EVENTS & ACTIVITIES
           </div>
+          <h1 className="text-4xl md:text-7xl font-black text-white">&lt;Events/&gt;</h1>
+          <p className="text-gray-400 mt-4 max-w-2xl mx-auto font-sans text-lg">
+            Workshops, hackathons, contests and talks — everything we've built together, and what's coming next.
+          </p>
         </div>
 
-        {/* 2. Past Events Gallery Slider */}
-        <div>
-          <h2 className="text-2xl md:text-4xl font-black text-white mb-8 md:mb-12 pb-2 md:pb-4 border-b-2 border-forge-yellow inline-block">
-            Past Event Gallery
-          </h2>
-          <div className="-mx-2 md:-mx-4 pb-8 md:pb-12">
-            <Slider {...sliderSettings}>
-              {pastEvents.map(event => (
-                <GalleryCard key={event.id} event={event} />
-              ))}
-            </Slider>
+        {upcoming.length > 0 && (
+          <div className="mb-20 md:mb-28">
+            <SectionHeading cmd="./upcoming" title="Upcoming" />
+            <div className="space-y-8">
+              {upcoming.map((e) => <UpcomingSpotlight key={e.slug} event={e} />)}
+            </div>
           </div>
+        )}
+
+        <SectionHeading cmd="git log --all" title="Past Events" subtitle={`${past.length} events and counting. Tap any card for details, highlights and photos.`} />
+
+        <div className="flex flex-wrap gap-2 mb-10" role="tablist" aria-label="Filter events">
+          {CATEGORIES.filter((c) => counts[c]).map((c) => (
+            <button key={c} role="tab" aria-selected={filter === c} onClick={() => setFilter(c)}
+              className={`px-4 py-2 rounded-full text-sm border transition-colors ${filter === c
+                ? "bg-forge-yellow text-black border-forge-yellow font-bold"
+                : "border-white/15 text-gray-300 hover:border-forge-yellow/60 hover:text-white"}`}>
+              {c} <span className={filter === c ? "text-black/60" : "text-gray-500"}>{counts[c]}</span>
+            </button>
+          ))}
         </div>
 
+        {byYear.map(([year, list]) => (
+          <div key={year} className="mb-14">
+            <div className="flex items-center gap-4 mb-6">
+              <h3 className="text-2xl md:text-3xl font-black text-white">{year}</h3>
+              <div className="h-px flex-grow bg-gradient-to-r from-forge-yellow/50 to-transparent" />
+              <span className="text-xs text-gray-500">{list.length} event{list.length > 1 ? "s" : ""}</span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {list.map((e, i) => (
+                <Reveal key={e.slug} delay={(i % 3) * 80}><EventCard event={e} onOpen={setOpen} /></Reveal>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

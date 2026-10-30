@@ -132,13 +132,13 @@ const communitiesData = [
       },
       { 
         name: "Diksha Anand", 
-        role: "Lead ",
+        role: "Co-Lead",
         image: "https://rtime2025.netlify.app/Images/Members/S5.jpg" 
       },
       { 
-        name: "Akash Kumar", 
-        role: "Core Team",
-        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1770854400&v=beta&t=TORzJnuU_466BWcnls6PioUS3XGcZvkAlC6fcPWziiI" 
+        name: "Vishal Lodhi", 
+        role: "Co-Lead",
+        image: null
       },
      
       { 
@@ -182,7 +182,7 @@ const communitiesData = [
         image: "https://media.licdn.com/dms/image/v2/D5603AQGLCxhOqT8zZw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725464826423?e=1770854400&v=beta&t=2aKr3bw5PV6ptA2JIpTMrQoBTO1reDxj7b35_PINL1s" 
       },
       { 
-        name: "Anubhav kumar", 
+        name: "Anubhav Dubey", 
         role: "Core Team ",
         image: "https://res.cloudinary.com/dp7clwitm/image/upload/v1767504784/WhatsApp_Image_2026-01-04_at_07.44.34_qwiqs3.jpg" 
       },
@@ -302,8 +302,10 @@ const CommunityCard = ({ community }) => {
               {/* UPDATED: Image Container */}
               <div className="w-20 h-20 mb-4 rounded-full border-2 border-forge-yellow/30 p-0.5 group-hover:border-forge-yellow transition-all group-hover:shadow-[0_0_10px_rgba(255,215,0,0.4)]">
                 <img 
-                  src={head.image} 
+                  src={head.image || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(head.name)}&backgroundColor=1a1a1a&textColor=f97316`} 
                   alt={head.name} 
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(head.name)}&backgroundColor=1a1a1a&textColor=f97316`; }}
                   className="w-full h-full rounded-full object-cover  group-hover:grayscale-0 transition-all duration-300"
                 />
               </div>

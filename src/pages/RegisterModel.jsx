@@ -34,7 +34,7 @@ const RegisterModal = ({ eventName, onClose }) => {
         setStatus(""); 
       }, 2000);
     })
-    .catch((error) => setStatus("Error. Please try again."));
+    .catch(() => setStatus("Error. Please try again."));
   };
 
   return (

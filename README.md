@@ -1,16 +1,55 @@
-# React + Vite
+# Code Forge NIAMT — website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The official website of **<Code/Forge>**, the coding club of NIAMT Ranchi. Built with React 19, Vite, Tailwind CSS v4 and React Router, deployed on Netlify (forms for contact and event registration).
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev      # local dev server
+npm run build    # production build in /dist
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Where things live
 
-## React Compiler
+| What | File |
+| --- | --- |
+| **All events (upcoming + past)** | `src/data/events.js` |
+| Links, stats, communities preview, FAQ, gallery | `src/data/site.js` |
+| Home page | `src/components/HeroSection.jsx` |
+| Events page | `src/pages/EventsSection.jsx` |
+| Gallery page | `src/pages/Gallery.jsx` |
+| Community details & heads | `src/pages/Communities.jsx` |
+| Advisors | `src/pages/About.jsx` |
+| Hero background video, trailer, posters | `public/media/` |
+| Event posters | `public/events/<slug>/` |
+| Gallery photos | `public/gallery/` |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Adding an event
 
-## Expanding the ESLint configuration
+1. Put the poster in `public/events/<slug>/01.webp` (or .jpg/.png). Keep it under ~300 KB.
+2. Add a block to `src/data/events.js`:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```js
+{
+  slug: "hackathon-2027",
+  title: "Forge Hackathon 2027",
+  category: "Hackathon",            // Workshop | Session | Competition | Hackathon | Induction | Community
+  start: "2027-02-14T10:00:00+05:30",
+  end:   "2027-02-15T18:00:00+05:30", // optional, for multi-day events
+  dateLabel: "14 – 15 Feb 2027",
+  time: "10:00 AM",
+  venue: "ITnC Lab",
+  banner: "/events/hackathon-2027/01.webp",
+  registration: true,               // shows "Register Now" (Netlify form)
+  description: "…",
+  highlights: ["…", "…"],
+  gallery: ["/events/hackathon-2027/02.webp"],  // optional photos in the details popup
+},
+```
+
+An event shows under **Upcoming** (with a live countdown on the home page) until it ends, then moves to **Past Events** automatically, so you never have to move it by hand.
+
+## Media tips
+
+- Hero background: `public/media/hero-loop.mp4`. Keep it short, silent and 720p (≈1–2 MB).
+- Re-encode videos with `ffmpeg -i in.mp4 -vf scale=1280:-2 -c:v libx264 -crf 27 -movflags +faststart out.mp4`.
+- Convert photos to WebP (≈1200–1400 px wide) before adding them.

@@ -3,14 +3,20 @@
 @theme {
   --color-forge-yellow: #F97316;
   --color-forge-dark: #0a0a0a;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  
-  /* Define a strong neon glow drop-shadow */
- --drop-shadow-neon: 
-  0 0 12px rgba(249, 115, 22, 0.7),
-  0 0 28px rgba(249, 115, 22, 0.45),
-  0 0 48px rgba(249, 115, 22, 0.25);
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
 
+  /* Define a strong neon glow drop-shadow */
+  --drop-shadow-neon:
+    0 0 12px rgba(249, 115, 22, 0.7),
+    0 0 28px rgba(249, 115, 22, 0.45),
+    0 0 48px rgba(249, 115, 22, 0.25);
+
+  --animate-marquee: marquee 60s linear infinite;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 }
 
 @utility bg-dot-pattern {
@@ -20,8 +26,9 @@
 
 /* Custom class for text glow */
 @utility text-glow {
-  text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.2);
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.6), 0 0 40px rgba(249, 115, 22, 0.2);
 }
+
 html {
   scroll-behavior: smooth;
 }
@@ -30,4 +37,13 @@ body {
   background-color: var(--color-forge-dark);
   color: white;
   min-height: 100vh;
+}
+
+::selection {
+  background: rgba(249, 115, 22, 0.85);
+  color: #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
