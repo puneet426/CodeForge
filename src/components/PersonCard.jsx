@@ -31,7 +31,8 @@ const GitHubIcon = (p) => (
 );
 
 // Card for an alumnus or a member. Shows a "Connect" button when a LinkedIn link exists.
-const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar }) => (
+// Self-registered members can also pass bio, stack (array) and projects.
+const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar, bio, stack = [], projects = [] }) => (
   <div className="group h-full flex flex-col rounded-2xl border border-white/10 bg-black/50 p-5 hover:border-forge-yellow/60 hover:-translate-y-0.5 transition-all duration-300">
     <div className="flex items-start gap-4">
       <Avatar name={name} src={avatar} />
@@ -41,6 +42,26 @@ const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar }) => (
         {line2 && <p className="text-xs text-forge-yellow font-mono mt-1">{line2}</p>}
       </div>
     </div>
+    {bio && <p className="mt-3 text-sm text-gray-400 font-sans leading-relaxed line-clamp-3">{bio}</p>}
+    {stack.length > 0 && (
+      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Tech stack">
+        {stack.slice(0, 6).map((t) => (
+          <li key={t} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-mono text-gray-300">{t}</li>
+        ))}
+      </ul>
+    )}
+    {projects.length > 0 && (
+      <ul className="mt-3 space-y-1.5" aria-label="Projects">
+        {projects.map((p) => (
+          <li key={p.title} className="text-xs font-sans leading-snug">
+            {p.url
+              ? <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-mono font-bold text-white hover:text-forge-yellow transition-colors">{p.title} ↗</a>
+              : <span className="font-mono font-bold text-white">{p.title}</span>}
+            {p.desc && <span className="text-gray-500"> — {p.desc}</span>}
+          </li>
+        ))}
+      </ul>
+    )}
     <div className="mt-auto pt-4 flex items-center justify-between gap-2">
       {chip ? <span className="text-[11px] font-mono uppercase tracking-wider text-gray-500 truncate">{chip}</span> : <span />}
       <div className="flex items-center gap-2">

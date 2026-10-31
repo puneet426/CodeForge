@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import logo from '../assets/code.jpg';
-import { MEMBER_COUNT } from '../data/membersStats';
 
 const NAV = [
   { to: "/", label: "Home", end: true },
   { to: "/about", label: "About" },
   { to: "/communities", label: "Communities" },
   { to: "/events", label: "Events" },
-  // Members link shows once src/data/members.js has names in it
-  ...(MEMBER_COUNT > 0 ? [{ to: "/members", label: "Members" }] : []),
+  { to: "/members", label: "Members" },
   { to: "/alumni", label: "Alumni" },
   { to: "/gallery", label: "Gallery" },
   { to: "/contact", label: "Contact Us" },

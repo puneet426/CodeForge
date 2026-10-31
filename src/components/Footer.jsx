@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MEMBER_COUNT } from '../data/membersStats';
 import { LINKS } from '../data/site';
 
 const Footer = () => {
@@ -54,7 +53,7 @@ const Footer = () => {
               <li><Link to="/about" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">About Us</Link></li>
               <li><Link to="/communities" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Communities</Link></li>
               <li><Link to="/events" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Events</Link></li>
-              {MEMBER_COUNT > 0 && <li><Link to="/members" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Members</Link></li>}
+              <li><Link to="/members" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Members</Link></li>
               <li><Link to="/alumni" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Alumni</Link></li>
               <li><Link to="/gallery" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Gallery</Link></li>
               <li><Link to="/leaderboard" className="hover:text-forge-yellow transition-colors hover:translate-x-1 inline-block">Leaderboard</Link></li>
