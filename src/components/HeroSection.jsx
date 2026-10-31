@@ -12,6 +12,7 @@ import Lightbox from './Lightbox';
 import {SectionHeading, Reveal, Modal} from './ui';
 import Icon from './icons';
 import { getUpcoming, getPast } from '../data/events';
+import { useEvents } from '../lib/useEvents';
 import { ABOUT_SHORT, STATS, COMMUNITIES, FAQ as FAQ_ITEMS, GALLERY, LINKS } from '../data/site';
 import { useAlumni } from '../lib/useAlumni';
 import { topCompanies } from '../data/alumniStats';
@@ -60,9 +61,10 @@ const usePrefersReducedMotion = () => {
 
 const HeroSection = () => {
   const alumni = useAlumni();
-  const upcoming = getUpcoming();
+  const events = useEvents();
+  const upcoming = getUpcoming(events);
   const next = upcoming[0];
-  const past = getPast();
+  const past = getPast(events);
   const reduce = usePrefersReducedMotion();
   const [trailer, setTrailer] = useState(false);
   const [register, setRegister] = useState(false);

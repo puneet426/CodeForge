@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -12,6 +12,9 @@ import Alumni from './pages/Alumni';
 import Footer from './components/Footer';
 import Guidelines from './pages/Guidelines';
 import ContactSection from './pages/ContactSection';
+
+// Hidden admin page (not linked anywhere); loaded only when visited.
+const Admin = lazy(() => import('./pages/Admin'));
 
 // Scroll to top on page change (or to the #hash target if there is one).
 function ScrollManager() {
@@ -43,6 +46,7 @@ function App() {
           <Route path="/contact" element={<div className="pt-16"><ContactSection /></div>} />
           <Route path="/guidelines" element={<Guidelines />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen" />}><Admin /></Suspense>} />
         </Routes>
         <Footer />
       </div>

@@ -1,40 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const Leaderboard = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Old Google Sheet — used only until scores are in Supabase.
   const SHEET_ID = "1EuuFzU6CCENRwWUDgAKnpLs-07TgVq8Yaazs27gmJTI";
-  const SHEET_NAME = "Leaderboard"; 
+  const SHEET_NAME = "Leaderboard";
 
   useEffect(() => {
-    fetch(`https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!Array.isArray(data)) {
-          console.error("Sheet Error:", data);
-          setLoading(false);
-          return; 
-        }
+    const show = (data) => {
+      const validData = data.filter((s) => s.Name && String(s.Name).trim() !== "");
+      const sortedData = validData.sort((a, b) => Number(b.Total_Score) - Number(a.Total_Score));
+      setStudents(sortedData.map((student, index) => ({
+        ...student,
+        rank: index + 1,
+        avatarUrl: student.Github_Username
+          ? `https://github.com/${student.Github_Username}.png`
+          : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(student.Name)}`,
+      })));
+      setLoading(false);
+    };
+    const fromSheet = () =>
+      fetch(`https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`)
+        .then((res) => res.json())
+        .then((data) => (Array.isArray(data) ? show(data) : (console.error("Sheet Error:", data), setLoading(false))))
+        .catch((err) => { console.error("Error fetching leaderboard:", err); setLoading(false); });
 
-        const validData = data.filter(student => student.Name && student.Name.trim() !== "");
-        const sortedData = validData.sort((a, b) => b.Total_Score - a.Total_Score);
-        
-        const rankedData = sortedData.map((student, index) => ({
-          ...student,
-          rank: index + 1,
-          avatarUrl: student.Github_Username 
-            ? `https://github.com/${student.Github_Username}.png`
-            : `https://api.dicebear.com/7.x/initials/svg?seed=${student.Name}`
-        }));
-        
-        setStudents(rankedData);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching leaderboard:", err);
-        setLoading(false);
-      });
+    // Scores are managed at /admin → Leaderboard (Supabase table `leaderboard`).
+    if (!supabase) { fromSheet(); return; }
+    supabase.from("leaderboard").select("name, github, score").then(({ data, error }) => {
+      if (error || !data?.length) { if (error) console.error("Leaderboard fetch failed:", error.message); fromSheet(); return; }
+      show(data.map((r) => ({ Name: r.name, Github_Username: r.github || "", Total_Score: Number(r.score) })));
+    });
   }, []);
 
   if (loading) return <div className="min-h-screen bg-forge-dark flex items-center justify-center text-forge-yellow font-mono animate-pulse">Loading Scores...</div>;

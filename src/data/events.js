@@ -1,5 +1,6 @@
 // =====================================================================
-// EVENTS — single source of truth for the whole site.
+// EVENTS — fallback copy + source for supabase/seed.sql.
+// Once Supabase is set up, add/edit events from /admin instead of here.
 //
 // • An event shows under "Upcoming" until its `end` (or `start`) time has
 //   passed, then moves to "Past Events" automatically. No manual moving.
@@ -289,10 +290,11 @@ export const events = [
 // ------------------------------------------------------------------ helpers
 const endOf = (e) => new Date(e.end || e.start).getTime() + (e.end ? 0 : 3 * 3600 * 1000);
 
-export const getUpcoming = (now = Date.now()) =>
-  events.filter((e) => endOf(e) > now).sort((a, b) => new Date(a.start) - new Date(b.start));
+// `list` is the events from Supabase (see src/lib/useEvents.js), or this file's list.
+export const getUpcoming = (list = events, now = Date.now()) =>
+  list.filter((e) => endOf(e) > now).sort((a, b) => new Date(a.start) - new Date(b.start));
 
-export const getPast = (now = Date.now()) =>
-  events.filter((e) => endOf(e) <= now).sort((a, b) => new Date(b.start) - new Date(a.start));
+export const getPast = (list = events, now = Date.now()) =>
+  list.filter((e) => endOf(e) <= now).sort((a, b) => new Date(b.start) - new Date(a.start));
 
 export const CATEGORIES = ["All", "Workshop", "Session", "Competition", "Hackathon", "Induction", "Community"];

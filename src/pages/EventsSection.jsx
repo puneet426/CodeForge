@@ -4,14 +4,16 @@ import EventCard from '../components/EventCard';
 import EventModal from '../components/EventModal';
 import { SectionHeading, Reveal } from '../components/ui';
 import { getUpcoming, getPast, CATEGORIES } from '../data/events';
+import { useEvents } from '../lib/useEvents';
 
 // =========================================
 // Events page: upcoming spotlight + filterable past-events archive.
-// All data lives in src/data/events.js
+// Data: Supabase `events` table (managed from /admin), fallback src/data/events.js
 // =========================================
 const EventsSection = () => {
-  const upcoming = getUpcoming();
-  const past = getPast();
+  const events = useEvents();
+  const upcoming = useMemo(() => getUpcoming(events), [events]);
+  const past = useMemo(() => getPast(events), [events]);
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState(null);
 

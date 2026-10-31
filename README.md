@@ -12,7 +12,7 @@ npm run build    # production build in /dist
 
 | What | File |
 | --- | --- |
-| **All events (upcoming + past)** | `src/data/events.js` |
+| All events (upcoming + past) | `/admin` → Events (fallback copy: `src/data/events.js`) |
 | Links, stats, communities preview, FAQ, gallery | `src/data/site.js` |
 | Home page | `src/components/HeroSection.jsx` |
 | Events page | `src/pages/EventsSection.jsx` |
@@ -22,14 +22,15 @@ npm run build    # production build in /dist
 | Hero background video, trailer, posters | `public/media/` |
 | Event posters | `public/events/<slug>/` |
 | Gallery photos | `public/gallery/` |
-| **Members & alumni database (Supabase)** | `supabase/` — setup guide in [`supabase/README.md`](supabase/README.md) |
+| **Database (Supabase): members, events, leaderboard, alumni, admins** | `supabase/` — setup guide in [`supabase/README.md`](supabase/README.md) |
+| Admin panel (hidden, `/admin`, 5 leads only) | `src/pages/Admin.jsx`, `src/admin/` |
 | Supabase connection | `src/lib/supabase.js` (keys from `.env.local` / Netlify env vars) |
 | Batches, branches, college email domain | `src/data/members.js` |
 | Member registration form | `src/components/MemberRegisterModal.jsx` |
 
 ## Backend (Supabase) — where to add the API keys
 
-Members and alumni are stored in Supabase. The site needs two environment variables
+Members, events, the leaderboard and alumni are stored in Supabase and managed by the 5 leads at `/admin`. The site needs two environment variables
 (from Supabase → Project Settings → API):
 
 ```
@@ -43,6 +44,8 @@ VITE_SUPABASE_ANON_KEY=your-anon-public-key
 Full setup (tables, existing data, email codes, approving members): [`supabase/README.md`](supabase/README.md).
 
 ## Adding an event
+
+> With Supabase set up, add events from **`/admin` → Events** instead (no code or redeploy needed). The steps below edit the fallback copy.
 
 1. Put the poster in `public/events/<slug>/01.webp` (or .jpg/.png). Keep it under ~300 KB.
 2. Add a block to `src/data/events.js`:

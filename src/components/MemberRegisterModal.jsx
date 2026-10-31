@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { BATCHES, BRANCHES, COLLEGE_EMAIL_DOMAIN, isCollegeEmail } from '../data/members';
 import { supabase } from '../lib/supabase';
 import { Avatar } from './PersonCard';
+import EmailCodeLogin, { ErrorMsg } from './EmailCodeLogin';
+import { inputCls as input, btnCls as btn, friendlyAuthError } from '../lib/formUi';
 
 // Flow: 1) college email → 2) one-time code from that inbox → 3) profile form.
 // The student can come back later, verify again, and edit their profile.
@@ -13,11 +15,8 @@ const EMPTY = {
   projects: [blankProject(), blankProject()], githubUrl: "", linkedin: "",
 };
 
-const input = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-forge-yellow transition-colors";
-const btn = "w-full py-3.5 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 disabled:opacity-60 transition-colors";
 const Label = ({ children, htmlFor }) => <label htmlFor={htmlFor} className="block text-sm text-gray-300 mb-1.5">{children}</label>;
 const Req = () => <span className="text-forge-yellow">*</span>;
-const ErrorMsg = ({ msg }) => (msg ? <p role="alert" className="text-sm text-red-400 font-bold">{msg}</p> : null);
 const Muted = ({ children }) => <span className="text-gray-500">{children}</span>;
 
 const isHttps = (u) => !u || /^https:\/\/\S+$/i.test(u.trim());
@@ -45,19 +44,14 @@ const toRow = (f, userId) => ({
 });
 
 const friendly = (msg = "") => {
-  if (/rate limit|too many/i.test(msg)) return "Too many attempts. Please wait a few minutes and try again.";
-  if (/expired|invalid/i.test(msg) && /token|otp|code/i.test(msg)) return "That code is wrong or has expired. Request a new one.";
   if (/row-level security/i.test(msg)) return `Only @${COLLEGE_EMAIL_DOMAIN} accounts can register.`;
   if (/members_email_key/i.test(msg)) return "This email is already on the members list. Contact the core team to link it.";
   if (/check constraint/i.test(msg)) return "Some fields aren't valid. Links must start with https:// and the GitHub username can only use letters, numbers and dashes.";
-  if (/fetch/i.test(msg)) return "Couldn't reach the server. Check your connection and try again.";
-  return msg || "Something went wrong. Please try again.";
+  return friendlyAuthError(msg);
 };
 
 const MemberRegisterModal = ({ onClose, onSaved }) => {
-  const [step, setStep] = useState(supabase ? "loading" : "closed"); // loading | email | code | form | done | closed
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [step, setStep] = useState(supabase ? "loading" : "closed"); // loading | login | wrong | form | done | closed
   const [user, setUser] = useState(null);
   const [existing, setExisting] = useState(null);
   const [f, setF] = useState(EMPTY);
@@ -78,14 +72,14 @@ const MemberRegisterModal = ({ onClose, onSaved }) => {
     if (!supabase) return;
     let alive = true;
     const enter = async (u) => {
-      if (!isCollegeEmail(u.email || "")) { await supabase.auth.signOut(); if (alive) setStep("email"); return; }
+      if (!isCollegeEmail(u.email || "")) { if (alive) { setUser(u); setStep("wrong"); } return; }
       const { data } = await supabase.from("members").select("*").eq("user_id", u.id).maybeSingle();
       if (!alive) return;
       setUser(u); setExisting(data || null);
       if (data) setF(fromRow(data));
       setStep("form");
     };
-    supabase.auth.getSession().then(({ data }) => (data.session ? enter(data.session.user) : alive && setStep("email")));
+    supabase.auth.getSession().then(({ data }) => (data.session ? enter(data.session.user) : alive && setStep("login")));
     // Also handles the student clicking the link in the email instead of typing the code.
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
       // Deferred: calling Supabase from inside this callback can deadlock.
@@ -94,32 +88,9 @@ const MemberRegisterModal = ({ onClose, onSaved }) => {
     return () => { alive = false; sub.subscription.unsubscribe(); };
   }, []);
 
-  const sendCode = async (e) => {
-    e?.preventDefault();
-    setErr("");
-    if (!isCollegeEmail(email)) { setErr(`Please use your college email ending in @${COLLEGE_EMAIL_DOMAIN}.`); return; }
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
-      options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/members?register=1` },
-    });
-    setBusy(false);
-    if (error) { setErr(friendly(error.message)); return; }
-    setCode(""); setStep("code");
-  };
-
-  const verify = async (e) => {
-    e.preventDefault();
-    setErr(""); setBusy(true);
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: "email" });
-    setBusy(false);
-    if (error) setErr(friendly(error.message));
-    // On success onAuthStateChange moves us to the form.
-  };
-
   const signOut = async () => {
     await supabase.auth.signOut();
-    setUser(null); setExisting(null); setF(EMPTY); setEmail(""); setErr(""); setStep("email");
+    setUser(null); setExisting(null); setF(EMPTY); setErr(""); setStep("login");
   };
 
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
@@ -151,8 +122,6 @@ const MemberRegisterModal = ({ onClose, onSaved }) => {
     onSaved?.();
   };
 
-  const emailBad = email && !isCollegeEmail(email);
-
   return (
     <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -170,39 +139,22 @@ const MemberRegisterModal = ({ onClose, onSaved }) => {
 
         {step === "loading" && <p className="mt-6 text-forge-yellow animate-pulse">Loading…</p>}
 
-        {step === "email" && (
-          <form onSubmit={sendCode} className="mt-5 space-y-4">
-            <p className="text-gray-400 text-sm font-sans">Enter your college email. We'll send a one-time code to confirm it's you.</p>
-            <div>
-              <Label htmlFor="m-email">College Email <Req /></Label>
-              <input id="m-email" type="email" required autoFocus autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder={`yourname@${COLLEGE_EMAIL_DOMAIN}`} aria-invalid={emailBad || undefined}
-                className={`${input} ${emailBad ? "border-red-500/70 focus:border-red-500" : ""}`} />
-              {emailBad && <p className="text-xs text-red-400 mt-1">Only @{COLLEGE_EMAIL_DOMAIN} emails can register.</p>}
-            </div>
-            <ErrorMsg msg={err} />
-            <button type="submit" disabled={busy} className={btn}>{busy ? "Sending…" : "Send code"}</button>
-          </form>
+        {step === "login" && (
+          <EmailCodeLogin
+            intro="Enter your college email. We'll send a one-time code to confirm it's you."
+            placeholder={`yourname@${COLLEGE_EMAIL_DOMAIN}`}
+            allowEmail={(e) => (isCollegeEmail(e) ? "" : `Only @${COLLEGE_EMAIL_DOMAIN} emails can register.`)}
+            redirectPath="/members?register=1" />
         )}
 
-        {step === "code" && (
-          <form onSubmit={verify} className="mt-5 space-y-4">
+        {step === "wrong" && (
+          <div className="mt-5 space-y-4">
             <p className="text-gray-400 text-sm font-sans">
-              We sent a code to <span className="text-white font-mono">{email.trim().toLowerCase()}</span>. Check your inbox (and spam).
+              You're signed in as <span className="text-white font-mono">{user?.email}</span>, which isn't a college email.
+              Sign out and use your @{COLLEGE_EMAIL_DOMAIN} address to register.
             </p>
-            <div>
-              <Label htmlFor="m-code">Verification code <Req /></Label>
-              <input id="m-code" required autoFocus inputMode="numeric" autoComplete="one-time-code" maxLength={10}
-                value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} placeholder="123456"
-                className={`${input} text-center text-xl tracking-[0.4em]`} />
-            </div>
-            <ErrorMsg msg={err} />
-            <button type="submit" disabled={busy || code.length < 6} className={btn}>{busy ? "Verifying…" : "Verify"}</button>
-            <div className="flex justify-between text-xs">
-              <button type="button" onClick={() => { setErr(""); setStep("email"); }} className="text-gray-400 hover:text-white">← Change email</button>
-              <button type="button" onClick={sendCode} disabled={busy} className="text-forge-yellow hover:underline">Resend code</button>
-            </div>
-          </form>
+            <button onClick={signOut} className={btn}>Sign out</button>
+          </div>
         )}
 
         {step === "form" && (
