@@ -14,12 +14,9 @@ const EMAIL_DOMAIN = 'niamt.ac.in';
 const BATCHES = ['2023-27', '2024-28', '2025-29', '2026-30'];
 const BRANCHES = [
   'Computer Engineering (CE)',
-  'Electronics & Communication Engineering (ECE)',
-  'Electrical Engineering (EE)',
   'Mechanical Engineering (ME)',
-  'Manufacturing Engineering (MFE)',
   'Metallurgical & Materials Engineering (MME)',
-  'Other',
+  'Production & Industrial Engineering (PIE)',
 ];
 const HEADERS = [
   'Timestamp', 'Email', 'Name', 'Roll', 'Batch', 'Branch', 'GitHub', 'Photo',

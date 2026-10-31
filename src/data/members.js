@@ -19,12 +19,9 @@ export const BATCHES = [
 // Keep in sync with BRANCHES in backend/members-apps-script.gs.
 export const BRANCHES = [
   "Computer Engineering (CE)",
-  "Electronics & Communication Engineering (ECE)",
-  "Electrical Engineering (EE)",
   "Mechanical Engineering (ME)",
-  "Manufacturing Engineering (MFE)",
   "Metallurgical & Materials Engineering (MME)",
-  "Other",
+  "Production & Industrial Engineering (PIE)",
 ];
 
 // Only college addresses can register.
