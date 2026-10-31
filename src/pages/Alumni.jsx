@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import PersonCard from '../components/PersonCard';
 import { Reveal } from '../components/ui';
-import { alumni } from '../data/alumni';
+import { useAlumni } from '../lib/useAlumni';
 import { LINKS } from '../data/site';
 import { topCompanies } from '../data/alumniStats';
 
@@ -12,6 +12,7 @@ const GROUPS = [
 ];
 
 const Alumni = () => {
+  const alumni = useAlumni();
   const [group, setGroup] = useState("all");
   const [q, setQ] = useState("");
 
@@ -20,7 +21,7 @@ const Alumni = () => {
     return alumni.filter((a) =>
       (group === "all" || a.group === group) &&
       (!s || `${a.name} ${a.role} ${a.company} ${a.sector}`.toLowerCase().includes(s)));
-  }, [group, q]);
+  }, [alumni, group, q]);
 
   const counts = { all: alumni.length, leaders: alumni.filter((a) => a.group === "leaders").length, tech: alumni.filter((a) => a.group === "tech").length };
 
@@ -35,7 +36,7 @@ const Alumni = () => {
           {alumni.length}+ alumni building at Google, KPMG, ZS, Capgemini, Infosys, startups and more. Reach out, ask for guidance, and connect on LinkedIn.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          {topCompanies(10).map((c) => (
+          {topCompanies(alumni, 10).map((c) => (
             <span key={c} className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-gray-300">{c}</span>
           ))}
         </div>

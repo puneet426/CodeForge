@@ -1,7 +1,5 @@
-import { alumni } from './alumni';
-
 // Most common companies (ignoring blanks), for the "where our alumni work" strips.
-export const topCompanies = (n = 12) => {
+export const topCompanies = (alumni, n = 12) => {
   const c = {};
   alumni.forEach((a) => {
     if (a.company) {

@@ -22,6 +22,25 @@ npm run build    # production build in /dist
 | Hero background video, trailer, posters | `public/media/` |
 | Event posters | `public/events/<slug>/` |
 | Gallery photos | `public/gallery/` |
+| **Members & alumni database (Supabase)** | `supabase/` — setup guide in [`supabase/README.md`](supabase/README.md) |
+| Supabase connection | `src/lib/supabase.js` (keys from `.env.local` / Netlify env vars) |
+| Batches, branches, college email domain | `src/data/members.js` |
+| Member registration form | `src/components/MemberRegisterModal.jsx` |
+
+## Backend (Supabase) — where to add the API keys
+
+Members and alumni are stored in Supabase. The site needs two environment variables
+(from Supabase → Project Settings → API):
+
+```
+VITE_SUPABASE_URL=https://xxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+- **Live site:** Netlify → Site configuration → Environment variables, then redeploy.
+- **Local:** copy `.env.example` to `.env.local` and fill them in.
+
+Full setup (tables, existing data, email codes, approving members): [`supabase/README.md`](supabase/README.md).
 
 ## Adding an event
 

@@ -1,58 +1,34 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PersonCard from '../components/PersonCard';
 import MemberRegisterModal from '../components/MemberRegisterModal';
 import { Reveal } from '../components/ui';
-import { BATCHES, MEMBERS_API } from '../data/members';
-
-const githubFromUrl = (url = "") => (url.match(/github\.com\/([A-Za-z0-9-]{1,39})\/?$/i) || [])[1] || "";
-
-// Approved self-registered members from the Google Sheet (see backend/README.md).
-const useRegisteredMembers = () => {
-  const [state, setState] = useState({ members: [], loading: Boolean(MEMBERS_API) });
-  useEffect(() => {
-    if (!MEMBERS_API) return;
-    let alive = true;
-    fetch(MEMBERS_API)
-      .then((r) => r.json())
-      .then((d) => alive && setState({ members: Array.isArray(d.members) ? d.members : [], loading: false }))
-      .catch((err) => { console.error("Members fetch failed:", err); if (alive) setState({ members: [], loading: false }); });
-    return () => { alive = false; };
-  }, []);
-  return state;
-};
+import { BATCHES, COLLEGE_EMAIL_DOMAIN } from '../data/members';
+import { useMembers } from '../lib/useMembers';
 
 const Members = () => {
-  const { members: registered, loading } = useRegisteredMembers();
-  const [showForm, setShowForm] = useState(false);
-  const closeForm = useCallback(() => setShowForm(false), []);
+  const { members, loading, error } = useMembers();
+  const [params, setParams] = useSearchParams();
+  // ?register=1 opens the form (used by the link in the verification email).
+  const [showForm, setShowForm] = useState(() => params.get("register") === "1");
+  const closeForm = useCallback(() => {
+    setShowForm(false);
+    if (params.has("register")) setParams({}, { replace: true });
+  }, [params, setParams]);
 
-  // Hand-written lists + approved registrations, grouped by batch.
-  const batches = useMemo(() => BATCHES.map((b) => ({
-    ...b,
-    members: [
-      ...b.members,
-      ...registered.filter((m) => m.batch === b.id).map((m) => {
-        const github = m.github || githubFromUrl(m.githubUrl);
-        return {
-          name: m.name, branch: m.branch, role: m.role, linkedin: m.linkedin || undefined, github: github || undefined,
-          avatar: m.photo || (github ? `https://github.com/${github}.png?size=120` : undefined),
-          bio: m.bio, stack: m.stack || [], projects: m.projects || [],
-        };
-      }),
-    ],
-  })), [registered]);
-
-  const total = batches.reduce((n, b) => n + b.members.length, 0);
+  const batches = useMemo(() => BATCHES.map((b) => ({ ...b, members: members.filter((m) => m.batch === b.id) })), [members]);
+  const total = members.length;
   const filled = batches.filter((b) => b.members.length).length;
+
   const [picked, setPicked] = useState(null);
   const batchId = picked || (batches.find((b) => b.members.length) || batches[0]).id;
-  const [q, setQ] = useState("");
   const batch = batches.find((b) => b.id === batchId);
+  const [q, setQ] = useState("");
 
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();
     return batch.members
-      .filter((m) => !s || `${m.name} ${m.branch || ""} ${m.role || ""} ${m.community || ""} ${(m.stack || []).join(" ")}`.toLowerCase().includes(s))
+      .filter((m) => !s || `${m.name} ${m.branch || ""} ${m.role || ""} ${m.community || ""} ${m.stack.join(" ")}`.toLowerCase().includes(s))
       .sort((a, b) => (b.role ? 1 : 0) - (a.role ? 1 : 0) || a.name.localeCompare(b.name));
   }, [batch, q]);
 
@@ -68,9 +44,9 @@ const Members = () => {
         </p>
         <button onClick={() => setShowForm(true)}
           className="mt-6 px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors">
-          + Register as a member
+          + Register / edit your profile
         </button>
-        <p className="text-xs text-gray-500 mt-2">Use your @niamt.ac.in email · profiles appear after review</p>
+        <p className="text-xs text-gray-500 mt-2">Verify with your @{COLLEGE_EMAIL_DOMAIN} email · profiles appear after review</p>
       </div>
 
       <div className="max-w-7xl mx-auto">
@@ -94,8 +70,10 @@ const Members = () => {
           </label>
         </div>
 
-        {loading && batch.members.length === 0 ? (
+        {loading ? (
           <div className="py-20 text-center text-forge-yellow animate-pulse">Loading members…</div>
+        ) : error ? (
+          <div className="py-20 text-center text-gray-500">{error}</div>
         ) : batch.members.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 py-20 text-center text-gray-500">
             <p>No members listed for batch {batch.label} yet.</p>
@@ -106,10 +84,10 @@ const Members = () => {
             <p className="text-xs text-gray-500 mb-5">{list.length} member{list.length === 1 ? "" : "s"}</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {list.map((m, i) => (
-                <Reveal key={`${m.name}-${i}`} delay={(i % 4) * 50}>
+                <Reveal key={m.id} delay={(i % 4) * 50}>
                   <PersonCard name={m.name} line1={m.branch} line2={m.role} chip={m.community}
-                    linkedin={m.linkedin} github={m.github} bio={m.bio} stack={m.stack} projects={m.projects}
-                    avatar={m.avatar || (m.github ? `https://github.com/${m.github}.png?size=120` : undefined)} />
+                    linkedin={m.linkedin} github={m.github} avatar={m.avatar}
+                    bio={m.bio} stack={m.stack} projects={m.projects} />
                 </Reveal>
               ))}
             </div>

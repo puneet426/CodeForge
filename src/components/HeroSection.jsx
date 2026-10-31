@@ -13,7 +13,7 @@ import {SectionHeading, Reveal, Modal} from './ui';
 import Icon from './icons';
 import { getUpcoming, getPast } from '../data/events';
 import { ABOUT_SHORT, STATS, COMMUNITIES, FAQ as FAQ_ITEMS, GALLERY, LINKS } from '../data/site';
-import { alumni } from '../data/alumni';
+import { useAlumni } from '../lib/useAlumni';
 import { topCompanies } from '../data/alumniStats';
 import { Avatar } from './PersonCard';
 
@@ -59,6 +59,7 @@ const usePrefersReducedMotion = () => {
 };
 
 const HeroSection = () => {
+  const alumni = useAlumni();
   const upcoming = getUpcoming();
   const next = upcoming[0];
   const past = getPast();
@@ -231,7 +232,7 @@ const HeroSection = () => {
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">{alumni.length}+ alumni. <span className="text-forge-yellow">One network.</span></h2>
               <p className="text-gray-400 mt-4 font-sans">NIAMT / NIFFT alumni leading and building in tech — from Big Tech and consulting to their own startups. Find them, learn from them, connect on LinkedIn.</p>
               <div className="mt-6 flex flex-wrap gap-2">
-                {topCompanies(8).map((c) => (
+                {topCompanies(alumni, 8).map((c) => (
                   <span key={c} className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-gray-300 font-mono">{c}</span>
                 ))}
               </div>
