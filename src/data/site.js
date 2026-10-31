@@ -4,6 +4,7 @@ export const LINKS = {
   linkedin: "https://www.linkedin.com/company/code-forgeniamt",
   github: "https://github.com/codeforgeNIAMT",
   whatsapp: "https://chat.whatsapp.com/BlBNJT7f9XqC7s23myGI5k",
+  whatsappCommunity: "https://chat.whatsapp.com/CmcCasiZdvEEUDZ1YS2toA",
   email: "codeforgeniamt@gmail.com",
   niamt: "https://niamt.ac.in/",
 };

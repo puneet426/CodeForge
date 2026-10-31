@@ -293,7 +293,7 @@ const HeroSection = () => {
                 <p className="text-gray-300 mt-4 font-sans">Join the community for event updates, resources and everything Code Forge.</p>
               </div>
               <div className="mt-8 flex flex-col gap-3">
-                <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer"
+                <a href={LINKS.whatsappCommunity} target="_blank" rel="noopener noreferrer"
                   className="text-center px-6 py-3.5 rounded-lg bg-forge-yellow text-black font-black font-mono hover:bg-orange-400 transition-colors">
                   Join our WhatsApp community →
                 </a>
