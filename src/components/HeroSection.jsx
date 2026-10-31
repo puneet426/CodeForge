@@ -13,6 +13,9 @@ import {SectionHeading, Reveal, Modal} from './ui';
 import Icon from './icons';
 import { getUpcoming, getPast } from '../data/events';
 import { ABOUT_SHORT, STATS, COMMUNITIES, FAQ as FAQ_ITEMS, GALLERY, LINKS } from '../data/site';
+import { alumni } from '../data/alumni';
+import { topCompanies } from '../data/alumniStats';
+import { Avatar } from './PersonCard';
 
 const phrases = ["/career with", "/skills with", "/potential with"];
 
@@ -218,6 +221,42 @@ const HeroSection = () => {
           </div>
         </section>
       </div>
+
+      {/* ================= ALUMNI ================= */}
+      <section className="max-w-7xl mx-auto px-4 md:px-12 py-16 md:py-20">
+        <Reveal>
+          <div className="rounded-3xl border border-white/10 bg-black/50 overflow-hidden grid lg:grid-cols-2">
+            <div className="p-8 md:p-12">
+              <p className="font-mono text-xs md:text-sm text-forge-yellow mb-3"><span className="text-gray-500">@codeforge</span>niamt <span className="text-white/70">~$</span> ls ./alumni<span className="animate-pulse">_</span></p>
+              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">{alumni.length}+ alumni. <span className="text-forge-yellow">One network.</span></h2>
+              <p className="text-gray-400 mt-4 font-sans">NIAMT / NIFFT alumni leading and building in tech — from Big Tech and consulting to their own startups. Find them, learn from them, connect on LinkedIn.</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {topCompanies(8).map((c) => (
+                  <span key={c} className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-gray-300 font-mono">{c}</span>
+                ))}
+              </div>
+              <Link to="/alumni" className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-lg bg-forge-yellow text-black font-black font-mono hover:bg-orange-400 transition-colors">
+                Meet our alumni <Icon.arrow className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="relative p-8 md:p-12 bg-gradient-to-br from-forge-yellow/10 to-transparent border-t lg:border-t-0 lg:border-l border-white/10">
+              <ul className="space-y-4">
+                {alumni.filter((a) => a.group === "leaders" && a.company).slice(0, 5).map((a) => (
+                  <li key={a.linkedin}>
+                    <a href={a.linkedin} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4">
+                      <Avatar name={a.name} size="w-11 h-11" />
+                      <div className="min-w-0">
+                        <p className="text-white font-bold group-hover:text-forge-yellow transition-colors truncate">{a.name}</p>
+                        <p className="text-xs text-gray-400 font-mono truncate">{a.role} · {a.company}</p>
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Reveal>
+      </section>
 
       {/* ================= GALLERY STRIP ================= */}
       <section className="py-16 md:py-20">

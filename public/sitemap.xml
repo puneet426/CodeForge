@@ -39,6 +39,20 @@
   </url>
 
   <url>
+    <loc>https://codeforgeniamt.com/members</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://codeforgeniamt.com/alumni</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://codeforgeniamt.com/gallery</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>

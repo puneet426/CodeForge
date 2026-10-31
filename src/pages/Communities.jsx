@@ -140,6 +140,11 @@ const communitiesData = [
         role: "Co-Lead",
         image: null
       },
+      { 
+        name: "Akash Kumar", 
+        role: "Core Team",
+        image: "https://media.licdn.com/dms/image/v2/D5603AQGPjpgD0mMbBA/profile-displayphoto-shrink_400_400/B56ZQ3sOhrGoAg-/0/1736101129356?e=1770854400&v=beta&t=TORzJnuU_466BWcnls6PioUS3XGcZvkAlC6fcPWziiI" 
+      },
      
       { 
         name: "Abhishek Sinha", 

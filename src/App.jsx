@@ -7,6 +7,8 @@ import Communities from './pages/Communities';
 import EventsSection from './pages/EventsSection';
 import Leaderboard from './pages/Leaderboard';
 import Gallery from './pages/Gallery';
+import Members from './pages/Members';
+import Alumni from './pages/Alumni';
 import Footer from './components/Footer';
 import Guidelines from './pages/Guidelines';
 import ContactSection from './pages/ContactSection';
@@ -36,6 +38,8 @@ function App() {
           <Route path="/communities" element={<Communities />} />
           <Route path="/events" element={<EventsSection />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/members" element={<Members />} />
+          <Route path="/alumni" element={<Alumni />} />
           <Route path="/contact" element={<div className="pt-16"><ContactSection /></div>} />
           <Route path="/guidelines" element={<Guidelines />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
