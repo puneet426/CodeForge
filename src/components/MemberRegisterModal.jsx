@@ -229,7 +229,6 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
       email: emailToUse.trim().toLowerCase(),
       stack: typeof f.stack === 'string' ? f.stack.split(',').map(s => s.trim()).filter(Boolean) : f.stack,
       projects: f.projects.filter(p => p.title && p.title.trim()),
-      is_lead: Boolean(f.role && f.role !== 'Member'),
       is_approved: true, // No admin approval required!
     };
 

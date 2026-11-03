@@ -11,7 +11,7 @@ import {
 
 const githubFromUrl = (url = "") => (url.match(/github\.com\/([A-Za-z0-9-]{1,39})\/?$/i) || [])[1] || "";
 
-// Fetch approved members from Supabase, Apps Script, or local cache
+// Fetch members from Supabase, Apps Script, or local cache
 const useRegisteredMembers = (refreshTrigger) => {
   const [state, setState] = useState({ members: [], loading: true });
 
@@ -28,7 +28,7 @@ const useRegisteredMembers = (refreshTrigger) => {
             return;
           }
         } catch (err) {
-          console.warn("Supabase fetch failed, attempting fallback:", err);
+          console.warn("Supabase fetch fallback:", err);
         }
       }
 
@@ -42,7 +42,7 @@ const useRegisteredMembers = (refreshTrigger) => {
             return;
           }
         } catch (err) {
-          console.warn("Apps Script fetch failed:", err);
+          console.warn("Apps Script fetch error:", err);
         }
       }
 
@@ -86,12 +86,10 @@ const Members = () => {
         .filter((m) => m.batch === b.id)
         .map((m) => {
           const github = m.github || githubFromUrl(m.githubUrl || m.github_url);
-          const isLead = Boolean(m.is_lead || m.isLead || (m.role && m.role.toLowerCase().includes('lead')));
           return {
             name: m.name,
             branch: m.branch,
             role: m.role || "Member",
-            isLead: isLead,
             community: m.community,
             linkedin: m.linkedin || undefined,
             github: github || undefined,
@@ -111,17 +109,14 @@ const Members = () => {
   const [q, setQ] = useState("");
   const batch = batches.find((b) => b.id === batchId);
 
+  // Clean alphabetical list of all members in the batch
   const list = useMemo(() => {
     if (!batch) return [];
     const s = q.trim().toLowerCase();
     return batch.members
       .filter((m) => !s || `${m.name} ${m.branch || ""} ${m.role || ""} ${m.community || ""} ${(m.stack || []).join(" ")}`.toLowerCase().includes(s))
-      .sort((a, b) => (b.isLead ? 1 : 0) - (a.isLead ? 1 : 0) || a.name.localeCompare(b.name));
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [batch, q]);
-
-  // Separate leads from active members for clear hierarchy
-  const leads = useMemo(() => list.filter(m => m.isLead), [list]);
-  const generalMembers = useMemo(() => list.filter(m => !m.isLead), [list]);
 
   return (
     <div className="min-h-screen bg-forge-dark bg-dot-pattern pt-28 pb-20 px-4 md:px-12 font-mono text-white">
@@ -150,7 +145,7 @@ const Members = () => {
           </span>
           <span className="font-bold">Edit Profile</span>
           {savedProfile && (
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-0.5" title="Profile connected" />
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-0.5" title="Connected" />
           )}
         </button>
       </div>
@@ -169,7 +164,7 @@ const Members = () => {
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button 
               onClick={() => setShowForm(true)}
-              className="px-6 py-2.5 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+              className="px-6 py-2.5 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
               <span>Edit My Profile</span>
               <span className="text-xs bg-black/20 px-2 py-0.5 rounded font-mono">({savedProfile.name})</span>
             </button>
@@ -177,11 +172,11 @@ const Members = () => {
         ) : (
           <button 
             onClick={() => setShowForm(true)}
-            className="mt-6 px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+            className="mt-6 px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
             + Register as a member
           </button>
         )}
-        <p className="text-xs text-gray-500 mt-2 font-mono">Use your @niamt.ac.in email · Instant updates</p>
+        <p className="text-xs text-gray-500 mt-2 font-mono">Verify with @niamt.ac.in email · Instant publication</p>
       </div>
 
       {/* Main Content Area */}
@@ -209,7 +204,7 @@ const Members = () => {
             <input 
               value={q} 
               onChange={(e) => setQ(e.target.value)} 
-              placeholder="Search name, branch, role…"
+              placeholder="Search name, branch, skill…"
               className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-forge-yellow" 
             />
             <svg className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
@@ -222,75 +217,28 @@ const Members = () => {
         ) : list.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 py-20 text-center text-gray-500">
             <p className="text-gray-400">No members listed for batch {batch?.label} yet.</p>
-            <button onClick={() => setShowForm(true)} className="mt-4 text-forge-yellow font-bold hover:underline">
+            <button onClick={() => setShowForm(true)} className="mt-4 text-forge-yellow font-bold hover:underline cursor-pointer">
               Be the first to register →
             </button>
           </div>
         ) : (
-          <div className="space-y-10">
-            {/* 1. Core Team & Leads Tier (Hierarchy) */}
-            {leads.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-forge-yellow text-xs font-bold tracking-wider font-mono">
-                    ★ CORE TEAM & DOMAIN LEADS ({leads.length})
-                  </span>
-                  <div className="flex-1 h-px bg-forge-yellow/20" />
-                </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {leads.map((m, i) => (
-                    <Reveal key={`${m.name}-${i}`} delay={(i % 4) * 50}>
-                      <PersonCard 
-                        name={m.name} 
-                        line1={m.branch} 
-                        line2={m.role} 
-                        chip={m.community}
-                        linkedin={m.linkedin} 
-                        github={m.github} 
-                        bio={m.bio} 
-                        stack={m.stack} 
-                        projects={m.projects}
-                        avatar={m.avatar} 
-                        isLead={true}
-                      />
-                    </Reveal>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 2. Active Members Tier */}
-            {generalMembers.length > 0 && (
-              <div>
-                {leads.length > 0 && (
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-gray-400 text-xs font-bold tracking-wider font-mono">
-                      ▸ ACTIVE MEMBERS ({generalMembers.length})
-                    </span>
-                    <div className="flex-1 h-px bg-white/10" />
-                  </div>
-                )}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {generalMembers.map((m, i) => (
-                    <Reveal key={`${m.name}-${i}`} delay={(i % 4) * 50}>
-                      <PersonCard 
-                        name={m.name} 
-                        line1={m.branch} 
-                        line2={m.role} 
-                        chip={m.community}
-                        linkedin={m.linkedin} 
-                        github={m.github} 
-                        bio={m.bio} 
-                        stack={m.stack} 
-                        projects={m.projects}
-                        avatar={m.avatar} 
-                        isLead={false}
-                      />
-                    </Reveal>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {list.map((m, i) => (
+              <Reveal key={`${m.name}-${i}`} delay={(i % 4) * 50}>
+                <PersonCard 
+                  name={m.name} 
+                  line1={m.branch} 
+                  line2={m.role} 
+                  chip={m.community}
+                  linkedin={m.linkedin} 
+                  github={m.github} 
+                  bio={m.bio} 
+                  stack={m.stack} 
+                  projects={m.projects}
+                  avatar={m.avatar} 
+                />
+              </Reveal>
+            ))}
           </div>
         )}
       </div>

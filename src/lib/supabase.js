@@ -120,7 +120,6 @@ export const fetchMembersFromSupabase = async () => {
   const { data, error } = await supabase
     .from('members')
     .select('*')
-    .order('is_lead', { ascending: false })
     .order('name', { ascending: true });
 
   if (error) {
@@ -180,7 +179,6 @@ export const saveMemberProfile = async (payload) => {
     github_url: payload.githubUrl || (payload.github ? `https://github.com/${payload.github.trim()}` : null),
     linkedin: payload.linkedin?.trim() || null,
     website: payload.website?.trim() || null,
-    is_lead: Boolean(payload.is_lead || payload.isLead || (payload.role && payload.role.toLowerCase().includes('lead'))),
     is_approved: true, // Instant publication without admin approval
   };
 

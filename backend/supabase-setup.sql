@@ -17,18 +17,17 @@ CREATE TABLE IF NOT EXISTS public.members (
     github TEXT,
     photo TEXT,
     bio TEXT,
-    role TEXT DEFAULT 'Member', -- e.g. 'Club Lead', 'Web Lead', 'Member'
+    role TEXT DEFAULT 'Member', -- e.g. 'Member', 'Developer', etc.
     community TEXT,
     stack TEXT[] DEFAULT '{}',
     projects JSONB DEFAULT '[]'::jsonb,
     github_url TEXT,
     linkedin TEXT,
     website TEXT,
-    is_lead BOOLEAN DEFAULT false,
     is_approved BOOLEAN DEFAULT true -- Instant publication! No admin approval required.
 );
 
--- 2. Indexes for high performance
+-- 2. Indexes for fast lookup
 CREATE INDEX IF NOT EXISTS idx_members_batch ON public.members(batch);
 CREATE INDEX IF NOT EXISTS idx_members_email ON public.members(email);
 CREATE INDEX IF NOT EXISTS idx_members_user_id ON public.members(user_id);
