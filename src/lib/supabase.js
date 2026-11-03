@@ -10,6 +10,7 @@ export const supabase = isSupabaseConfigured
       auth: {
         persistSession: true,
         autoRefreshToken: true,
+        detectSessionInUrl: true,
       },
     })
   : null;
@@ -20,7 +21,7 @@ export const COLLEGE_EMAIL_DOMAIN = 'niamt.ac.in';
 export const isCollegeEmail = (email = '') =>
   new RegExp(`^[^\\s@]+@${COLLEGE_EMAIL_DOMAIN.replace(/\\./g, '\\.')}$`, 'i').test(email.trim());
 
-// Local profile cache for offline/instant UI feedback
+// Local profile cache for instant UI feedback
 export const getSavedLocalProfile = () => {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -44,11 +45,11 @@ export const setSavedLocalProfile = (profile) => {
 };
 
 // -------------------------------------------------------------
-// Authentication with NIAMT College Email
+// Authentication with NIAMT College Email (1-Click Magic Link)
 // -------------------------------------------------------------
 
-// Send 6-digit OTP to college email
-export const sendCollegeEmailOtp = async (email) => {
+// Send 1-click verification link to college email
+export const sendCollegeEmailLink = async (email) => {
   if (!supabase) {
     throw new Error('Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env');
   }
@@ -58,40 +59,23 @@ export const sendCollegeEmailOtp = async (email) => {
     throw new Error(`Only official college emails ending in @${COLLEGE_EMAIL_DOMAIN} can register.`);
   }
 
+  // Redirect back to the current members page when clicked
+  const redirectTo = typeof window !== 'undefined' ? window.location.href : undefined;
+
   const { data, error } = await supabase.auth.signInWithOtp({
     email: cleanEmail,
     options: {
       shouldCreateUser: true,
+      emailRedirectTo: redirectTo,
     },
   });
 
   if (error) {
-    console.error('sendCollegeEmailOtp error:', error);
-    throw new Error(error.message || 'Failed to send OTP to college email.');
+    console.error('sendCollegeEmailLink error:', error);
+    throw new Error(error.message || 'Failed to send verification link to college email.');
   }
 
   return data;
-};
-
-// Verify 6-digit OTP
-export const verifyCollegeEmailOtp = async (email, token) => {
-  if (!supabase) {
-    throw new Error('Supabase is not configured.');
-  }
-
-  const cleanEmail = email.trim().toLowerCase();
-  const { data, error } = await supabase.auth.verifyOtp({
-    email: cleanEmail,
-    token: token.trim(),
-    type: 'email',
-  });
-
-  if (error) {
-    console.error('verifyCollegeEmailOtp error:', error);
-    throw new Error(error.message || 'Invalid or expired OTP. Please check and try again.');
-  }
-
-  return data; // contains session and user
 };
 
 // Get current signed-in user

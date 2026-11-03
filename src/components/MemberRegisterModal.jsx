@@ -5,13 +5,13 @@ import {
   COLLEGE_EMAIL_DOMAIN,
   isCollegeEmail,
   isSupabaseConfigured,
-  sendCollegeEmailOtp,
-  verifyCollegeEmailOtp,
+  sendCollegeEmailLink,
   getCurrentAuthUser,
   signOutOfCollegeAccount,
   fetchMemberByEmail,
   saveMemberProfile,
   getSavedLocalProfile,
+  supabase,
 } from '../lib/supabase';
 
 const EMPTY = {
@@ -39,10 +39,9 @@ const ROLES = [
 ];
 
 const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
-  // Step: 'check-auth' | 'request-otp' | 'verify-otp' | 'profile-form' | 'success'
+  // Step: 'check-auth' | 'enter-email' | 'check-inbox' | 'profile-form' | 'success'
   const [step, setStep] = useState('check-auth');
   const [emailInput, setEmailInput] = useState("");
-  const [otpInput, setOtpInput] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
   const [isExistingMember, setIsExistingMember] = useState(false);
 
@@ -71,13 +70,29 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
       if (user && user.email) {
         await handleAuthenticatedUser(user.email);
       } else {
-        setStep('request-otp');
+        setStep('enter-email');
       }
     }
 
     checkAuth();
     return () => { alive = false; };
   }, [initialProfile]);
+
+  // Real-time listener: As soon as the user clicks the verification link in their email,
+  // Supabase authenticates the browser and this listener triggers automatically!
+  useEffect(() => {
+    if (!supabase) return;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user?.email) {
+        await handleAuthenticatedUser(session.user.email);
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -141,8 +156,8 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
     }));
   };
 
-  // Step 1: Send OTP to College Email
-  const handleSendOtp = async (e) => {
+  // Step 1: Send Verification Link to College Email
+  const handleSendLink = async (e) => {
     if (e) e.preventDefault();
     const cleanEmail = (emailInput || verifiedEmail).trim().toLowerCase();
     if (!isCollegeEmail(cleanEmail)) {
@@ -155,48 +170,21 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
 
     try {
       if (isSupabaseConfigured) {
-        await sendCollegeEmailOtp(cleanEmail);
+        await sendCollegeEmailLink(cleanEmail);
       }
       setVerifiedEmail(cleanEmail);
-      setStep('verify-otp');
+      setStep('check-inbox');
       setStatus({ state: "idle", msg: "" });
     } catch (err) {
       const msg = err.message || "";
       if (msg.toLowerCase().includes("rate limit")) {
         setStatus({ 
           state: "error", 
-          msg: "Please wait 60 seconds before requesting another code (security cooldown)." 
+          msg: "Security cooldown active: Please wait 60 seconds before requesting another email, or click the link already in your inbox." 
         });
       } else {
-        setStatus({ state: "error", msg: msg || "Failed to send OTP code." });
+        setStatus({ state: "error", msg: msg || "Failed to send verification link." });
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Step 2: Verify the 6-digit OTP code
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    const cleanOtp = otpInput.trim();
-    if (!cleanOtp) {
-      setStatus({ state: "error", msg: "Please enter the 6-digit OTP code." });
-      return;
-    }
-
-    setLoading(true);
-    setStatus({ state: "idle", msg: "" });
-
-    try {
-      if (isSupabaseConfigured) {
-        await verifyCollegeEmailOtp(verifiedEmail, cleanOtp);
-      }
-      await handleAuthenticatedUser(verifiedEmail);
-    } catch (err) {
-      setStatus({ 
-        state: "error", 
-        msg: "Invalid or expired OTP code. Please check your inbox and try again." 
-      });
     } finally {
       setLoading(false);
     }
@@ -204,14 +192,13 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
 
   const handleSignOut = async () => {
     await signOutOfCollegeAccount();
-    setStep('request-otp');
+    setStep('enter-email');
     setF(EMPTY);
     setVerifiedEmail("");
     setIsExistingMember(false);
-    setOtpInput("");
   };
 
-  // Step 3: Save profile to Supabase database (Instant live publish)
+  // Step 2: Save profile to Supabase database (Instant live publish)
   const handleSubmitProfile = async (e) => {
     e.preventDefault();
     const emailToUse = verifiedEmail || f.email;
@@ -259,20 +246,20 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
         {/* Close Button */}
         <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold cursor-pointer">✕</button>
 
-        {/* ================= STAGE 1: ENTER COLLEGE EMAIL ================= */}
-        {step === 'request-otp' && (
+        {/* ================= STEP 1: ENTER COLLEGE EMAIL ================= */}
+        {step === 'enter-email' && (
           <div className="py-4">
             <div className="inline-block px-3 py-1 mb-3 border border-forge-yellow/60 rounded-full bg-forge-yellow/10 text-forge-yellow text-xs font-bold tracking-widest">
-              COLLEGE ID VERIFICATION
+              OFFICIAL NIAMT EMAIL VERIFICATION
             </div>
             <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black mb-2">
-              Enter Your College Email
+              Sign In with College Email
             </h2>
             <p className="text-gray-400 text-sm font-sans mb-6">
-              Enter your NIAMT student email. We will send a 6-digit OTP code to verify your identity.
+              Enter your NIAMT student email. We will send a secure 1-click verification link directly to your inbox.
             </p>
 
-            <form onSubmit={handleSendOtp} className="space-y-4 max-w-lg">
+            <form onSubmit={handleSendLink} className="space-y-4 max-w-lg">
               <div>
                 <Label htmlFor="req-email">College Email ID <Req /></Label>
                 <input 
@@ -285,7 +272,7 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
                   className={input}
                 />
                 <p className="text-xs text-gray-500 mt-1 font-mono">
-                  Only @{COLLEGE_EMAIL_DOMAIN} allowed.
+                  Only @{COLLEGE_EMAIL_DOMAIN} permitted.
                 </p>
               </div>
 
@@ -297,72 +284,68 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
                 type="submit" 
                 disabled={loading}
                 className="w-full py-3 bg-forge-yellow text-black font-black rounded-lg hover:bg-orange-400 disabled:opacity-50 transition-colors shadow-md cursor-pointer">
-                {loading ? "Sending OTP…" : "Send 6-Digit OTP Code →"}
+                {loading ? "Sending Link…" : "Send Verification Link →"}
               </button>
             </form>
           </div>
         )}
 
-        {/* ================= STAGE 2: ENTER 6-DIGIT OTP CODE ================= */}
-        {step === 'verify-otp' && (
-          <div className="py-4 max-w-lg space-y-5">
-            <div className="inline-block px-3 py-1 border border-forge-yellow/60 rounded-full bg-forge-yellow/10 text-forge-yellow text-xs font-bold tracking-widest">
-              CHECK YOUR INBOX
+        {/* ================= STEP 2: CHECK INBOX (1-CLICK & DONE) ================= */}
+        {step === 'check-inbox' && (
+          <div className="py-6 text-center max-w-lg mx-auto space-y-6">
+            <div className="w-16 h-16 rounded-full bg-forge-yellow/15 text-forge-yellow flex items-center justify-center text-3xl mx-auto border border-forge-yellow/40">
+              ✉
             </div>
             <div>
-              <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black mb-1">
-                Enter 6-Digit OTP
+              <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black mb-2">
+                Check Your College Email
               </h2>
               <p className="text-gray-300 text-sm font-sans">
-                Sent to <span className="text-forge-yellow font-bold font-mono">{verifiedEmail}</span>. Enter the 6-digit code below:
+                We sent a verification link to <span className="text-forge-yellow font-bold font-mono">{verifiedEmail}</span>.
               </p>
             </div>
 
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div>
-                <input 
-                  type="text" 
-                  maxLength={6}
-                  required
-                  autoFocus
-                  value={otpInput}
-                  onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                  placeholder="• • • • • •"
-                  className={`${input} text-center tracking-[0.5em] text-2xl font-mono font-bold py-3`}
-                />
-              </div>
+            <div className="p-5 rounded-2xl border border-forge-yellow/40 bg-forge-yellow/[0.06] text-left space-y-2">
+              <p className="text-sm font-bold text-white flex items-center gap-2">
+                <span>👉</span> <span>Just 1 Click:</span>
+              </p>
+              <p className="text-xs text-gray-300 font-sans leading-relaxed">
+                Open your student inbox and click <strong>"Confirm email address"</strong> (or <strong>"Sign in"</strong>).
+              </p>
+              <p className="text-xs text-gray-400 font-sans pt-1">
+                This window will automatically detect your confirmation and open your profile form immediately!
+              </p>
+            </div>
 
-              {status.state === "error" && (
-                <p className="text-xs text-red-400 font-bold">{status.msg}</p>
-              )}
+            {/* Listening animation */}
+            <div className="flex items-center justify-center gap-2 text-xs text-forge-yellow/90 font-mono py-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-forge-yellow animate-ping" />
+              <span>Listening for email confirmation…</span>
+            </div>
 
-              <button 
-                type="submit" 
-                disabled={loading || otpInput.length < 6}
-                className="w-full py-3 bg-forge-yellow text-black font-black rounded-lg hover:bg-orange-400 disabled:opacity-50 transition-colors shadow-md cursor-pointer">
-                {loading ? "Verifying OTP…" : "Verify OTP & Continue →"}
-              </button>
-            </form>
+            {status.state === "error" && (
+              <p className="text-xs text-red-400 font-bold">{status.msg}</p>
+            )}
 
             <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-white/10">
               <button 
                 type="button" 
-                onClick={() => setStep('request-otp')} 
+                onClick={() => setStep('enter-email')} 
                 className="hover:text-white cursor-pointer">
                 ← Change Email
               </button>
               <button 
                 type="button" 
-                onClick={handleSendOtp} 
+                onClick={handleSendLink} 
                 disabled={loading}
                 className="text-forge-yellow hover:underline cursor-pointer disabled:opacity-50">
-                Resend OTP Code
+                Resend Link
               </button>
             </div>
           </div>
         )}
 
-        {/* ================= STAGE 3: PROFILE FORM ================= */}
+        {/* ================= STEP 3: PROFILE FORM ================= */}
         {step === 'profile-form' && (
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
@@ -503,7 +486,7 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
           </div>
         )}
 
-        {/* ================= STAGE 4: SUCCESS ================= */}
+        {/* ================= STEP 4: SUCCESS ================= */}
         {step === 'success' && (
           <div className="py-8 text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-3xl font-black mx-auto border border-green-500/40">
