@@ -6,6 +6,7 @@ import {
   isCollegeEmail,
   isSupabaseConfigured,
   sendCollegeEmailLink,
+  checkIfEmailConfirmed,
   getCurrentAuthUser,
   signOutOfCollegeAccount,
   fetchMemberByEmail,
@@ -78,8 +79,7 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
     return () => { alive = false; };
   }, [initialProfile]);
 
-  // Real-time listener: As soon as the user clicks the verification link in their email,
-  // Supabase authenticates the browser and this listener triggers automatically!
+  // Real-time listener: Triggers when the user confirms in this browser
   useEffect(() => {
     if (!supabase) return;
 
@@ -93,6 +93,32 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
       subscription?.unsubscribe();
     };
   }, []);
+
+  // Cross-Device Sync: Polls Supabase every 2.5 seconds to see if the user confirmed on their phone!
+  useEffect(() => {
+    if (step !== 'check-inbox' || !verifiedEmail) return;
+
+    let timer;
+    let isCancelled = false;
+
+    async function checkCrossDevice() {
+      const isConfirmed = await checkIfEmailConfirmed(verifiedEmail);
+      if (isConfirmed && !isCancelled) {
+        await handleAuthenticatedUser(verifiedEmail);
+        return;
+      }
+      if (!isCancelled) {
+        timer = setTimeout(checkCrossDevice, 2500);
+      }
+    }
+
+    timer = setTimeout(checkCrossDevice, 2500);
+
+    return () => {
+      isCancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [step, verifiedEmail]);
 
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -290,7 +316,7 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
           </div>
         )}
 
-        {/* ================= STEP 2: CHECK INBOX (1-CLICK & DONE) ================= */}
+        {/* ================= STEP 2: CHECK INBOX (CROSS-DEVICE SYNC) ================= */}
         {step === 'check-inbox' && (
           <div className="py-6 text-center max-w-lg mx-auto space-y-6">
             <div className="w-16 h-16 rounded-full bg-forge-yellow/15 text-forge-yellow flex items-center justify-center text-3xl mx-auto border border-forge-yellow/40">
@@ -305,22 +331,22 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl border border-forge-yellow/40 bg-forge-yellow/[0.06] text-left space-y-2">
+            <div className="p-5 rounded-2xl border border-forge-yellow/40 bg-forge-yellow/[0.06] text-left space-y-2.5">
               <p className="text-sm font-bold text-white flex items-center gap-2">
-                <span>👉</span> <span>Just 1 Click:</span>
+                <span>📱 / 💻</span> <span>Click on PC or Phone:</span>
               </p>
               <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                Open your student inbox and click <strong>"Confirm email address"</strong> (or <strong>"Sign in"</strong>).
+                Open your student inbox and click <strong>"Confirm email address"</strong>.
               </p>
-              <p className="text-xs text-gray-400 font-sans pt-1">
-                This window will automatically detect your confirmation and open your profile form immediately!
-              </p>
+              <div className="pt-1 border-t border-forge-yellow/20 text-xs text-forge-yellow/90 font-sans">
+                ⚡ <strong>Cross-device sync active:</strong> Even if you tap the link on your phone, this PC screen will automatically detect it and open your profile form!
+              </div>
             </div>
 
             {/* Listening animation */}
-            <div className="flex items-center justify-center gap-2 text-xs text-forge-yellow/90 font-mono py-1">
+            <div className="flex items-center justify-center gap-2 text-xs text-forge-yellow font-mono py-1">
               <span className="w-2.5 h-2.5 rounded-full bg-forge-yellow animate-ping" />
-              <span>Listening for email confirmation…</span>
+              <span>Waiting for confirmation click…</span>
             </div>
 
             {status.state === "error" && (

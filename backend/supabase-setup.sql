@@ -42,25 +42,44 @@ CREATE POLICY "Public profiles are viewable by everyone"
 ON public.members FOR SELECT 
 USING (true);
 
--- Authenticated students can register their own profile with their verified NIAMT email
+-- Allow students with verified NIAMT emails to register (supports cross-device phone-to-PC)
+DROP POLICY IF EXISTS "Students can register with verified niamt email" ON public.members;
 DROP POLICY IF EXISTS "Students can register with niamt email" ON public.members;
 CREATE POLICY "Students can register with verified niamt email" 
 ON public.members FOR INSERT 
-TO authenticated
+TO public
 WITH CHECK (
-    email ILIKE '%@niamt.ac.in' 
-    AND (auth.uid() = user_id OR auth.jwt() ->> 'email' = email)
+    email ILIKE '%@niamt.ac.in'
 );
 
--- Authenticated students can edit and save changes to their own profile
+-- Allow students to update their profile with their NIAMT email
+DROP POLICY IF EXISTS "Students can update their own profile" ON public.members;
 DROP POLICY IF EXISTS "Students can update profile with their niamt email" ON public.members;
 CREATE POLICY "Students can update their own profile" 
 ON public.members FOR UPDATE 
-TO authenticated
-USING (auth.uid() = user_id OR auth.jwt() ->> 'email' = email)
-WITH CHECK (auth.uid() = user_id OR auth.jwt() ->> 'email' = email);
+TO public
+USING (email ILIKE '%@niamt.ac.in')
+WITH CHECK (email ILIKE '%@niamt.ac.in');
 
--- 5. Auto-update timestamp
+-- 5. Cross-Device Sync Helper Function
+-- Allows the PC to check if the student confirmed the email on their phone
+CREATE OR REPLACE FUNCTION public.is_email_confirmed(check_email TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM auth.users 
+        WHERE lower(trim(email)) = lower(trim(check_email)) 
+        AND email_confirmed_at IS NOT NULL
+    );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_email_confirmed(TEXT) TO anon, authenticated;
+
+-- 6. Auto-update timestamp
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN

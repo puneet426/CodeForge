@@ -45,7 +45,7 @@ export const setSavedLocalProfile = (profile) => {
 };
 
 // -------------------------------------------------------------
-// Authentication with NIAMT College Email (1-Click Magic Link)
+// Authentication with NIAMT College Email (1-Click Link)
 // -------------------------------------------------------------
 
 // Send 1-click verification link to college email
@@ -59,7 +59,7 @@ export const sendCollegeEmailLink = async (email) => {
     throw new Error(`Only official college emails ending in @${COLLEGE_EMAIL_DOMAIN} can register.`);
   }
 
-  // Redirect back to the current members page when clicked
+  // Redirect to the current website page when clicked
   const redirectTo = typeof window !== 'undefined' ? window.location.href : undefined;
 
   const { data, error } = await supabase.auth.signInWithOtp({
@@ -76,6 +76,22 @@ export const sendCollegeEmailLink = async (email) => {
   }
 
   return data;
+};
+
+// Cross-device sync: Check if email was confirmed on phone or another tab
+export const checkIfEmailConfirmed = async (email) => {
+  if (!supabase || !email) return false;
+  try {
+    const { data, error } = await supabase.rpc('is_email_confirmed', {
+      check_email: email.trim().toLowerCase(),
+    });
+    if (error) {
+      return false;
+    }
+    return Boolean(data);
+  } catch (err) {
+    return false;
+  }
 };
 
 // Get current signed-in user
@@ -141,7 +157,6 @@ export const saveMemberProfile = async (payload) => {
     throw new Error(`Only @${COLLEGE_EMAIL_DOMAIN} emails are allowed.`);
   }
 
-  // Get authenticated user ID to link with profile
   const { data: { user } } = await supabase.auth.getUser();
 
   const record = {
