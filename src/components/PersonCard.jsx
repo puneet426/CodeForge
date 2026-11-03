@@ -32,14 +32,23 @@ const GitHubIcon = (p) => (
 
 // Card for an alumnus or a member. Shows a "Connect" button when a LinkedIn link exists.
 // Self-registered members can also pass bio, stack (array) and projects.
-const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar, bio, stack = [], projects = [] }) => (
-  <div className="group h-full flex flex-col rounded-2xl border border-white/10 bg-black/50 p-5 hover:border-forge-yellow/60 hover:-translate-y-0.5 transition-all duration-300">
+const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar, bio, stack = [], projects = [], isLead = false }) => (
+  <div className={`group h-full flex flex-col rounded-2xl p-5 hover:-translate-y-0.5 transition-all duration-300 relative ${
+    isLead
+      ? "border border-forge-yellow/60 bg-gradient-to-b from-forge-yellow/[0.07] to-black/70 shadow-[0_0_20px_rgba(249,115,22,0.12)] hover:border-forge-yellow"
+      : "border border-white/10 bg-black/50 hover:border-forge-yellow/60"
+  }`}>
+    {isLead && (
+      <div className="absolute -top-2.5 right-4 px-2 py-0.5 rounded bg-forge-yellow text-black font-mono font-black text-[10px] tracking-wider uppercase shadow-sm">
+        ★ LEAD
+      </div>
+    )}
     <div className="flex items-start gap-4">
       <Avatar name={name} src={avatar} />
-      <div className="min-w-0">
-        <h3 className="text-white font-bold leading-snug group-hover:text-forge-yellow transition-colors">{name}</h3>
+      <div className="min-w-0 flex-1">
+        <h3 className="text-white font-bold leading-snug group-hover:text-forge-yellow transition-colors truncate">{name}</h3>
         {line1 && <p className="text-sm text-gray-300 mt-0.5 font-sans leading-snug">{line1}</p>}
-        {line2 && <p className="text-xs text-forge-yellow font-mono mt-1">{line2}</p>}
+        {line2 && <p className="text-xs text-forge-yellow font-mono mt-1 font-bold">{line2}</p>}
       </div>
     </div>
     {bio && <p className="mt-3 text-sm text-gray-400 font-sans leading-relaxed line-clamp-3">{bio}</p>}

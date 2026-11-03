@@ -1,0 +1,31 @@
+name: Keep Supabase Project Active
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every 3 days (keeps Supabase from pausing due to 7-day inactivity)
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Allows manual trigger anytime from GitHub Actions tab
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Secrets not configured yet. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in GitHub Repo Settings -> Secrets."
+            exit 0
+          fi
+          echo "Pinging Supabase at $SUPABASE_URL..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$SUPABASE_URL/rest/v1/members?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "Supabase response HTTP status: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+            echo "Supabase project is active and alive!"
+          else
+            echo "Warning: Received unexpected status $STATUS"
+          fi
