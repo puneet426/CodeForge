@@ -3,10 +3,9 @@
 -- Run this in your Supabase Project -> SQL Editor
 -- ============================================================
 
--- 1. Create the members table linked to authenticated users
+-- 1. Create the members table
 CREATE TABLE IF NOT EXISTS public.members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     email TEXT UNIQUE NOT NULL,
@@ -24,13 +23,12 @@ CREATE TABLE IF NOT EXISTS public.members (
     github_url TEXT,
     linkedin TEXT,
     website TEXT,
-    is_approved BOOLEAN DEFAULT true -- Instant publication! No admin approval required.
+    is_approved BOOLEAN DEFAULT true -- Instant live publication!
 );
 
--- 2. Indexes for fast lookup
+-- 2. Indexes for fast batch & email queries
 CREATE INDEX IF NOT EXISTS idx_members_batch ON public.members(batch);
 CREATE INDEX IF NOT EXISTS idx_members_email ON public.members(email);
-CREATE INDEX IF NOT EXISTS idx_members_user_id ON public.members(user_id);
 
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
@@ -42,15 +40,13 @@ CREATE POLICY "Public profiles are viewable by everyone"
 ON public.members FOR SELECT 
 USING (true);
 
--- Allow students with verified NIAMT emails to register (supports cross-device phone-to-PC)
+-- Allow students with @niamt.ac.in emails to register directly
 DROP POLICY IF EXISTS "Students can register with verified niamt email" ON public.members;
 DROP POLICY IF EXISTS "Students can register with niamt email" ON public.members;
-CREATE POLICY "Students can register with verified niamt email" 
+CREATE POLICY "Students can register with niamt email" 
 ON public.members FOR INSERT 
 TO public
-WITH CHECK (
-    email ILIKE '%@niamt.ac.in'
-);
+WITH CHECK (email ILIKE '%@niamt.ac.in');
 
 -- Allow students to update their profile with their NIAMT email
 DROP POLICY IF EXISTS "Students can update their own profile" ON public.members;
@@ -61,25 +57,7 @@ TO public
 USING (email ILIKE '%@niamt.ac.in')
 WITH CHECK (email ILIKE '%@niamt.ac.in');
 
--- 5. Cross-Device Sync Helper Function
--- Allows the PC to check if the student confirmed the email on their phone
-CREATE OR REPLACE FUNCTION public.is_email_confirmed(check_email TEXT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    RETURN EXISTS (
-        SELECT 1 FROM auth.users 
-        WHERE lower(trim(email)) = lower(trim(check_email)) 
-        AND email_confirmed_at IS NOT NULL
-    );
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.is_email_confirmed(TEXT) TO anon, authenticated;
-
--- 6. Auto-update timestamp
+-- 5. Auto-update timestamp
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
