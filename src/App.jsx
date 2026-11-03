@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import About from './pages/About';
@@ -17,7 +17,7 @@ import ContactSection from './pages/ContactSection';
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    if (hash) {
+    if (hash && !hash.includes('access_token')) {
       const el = document.getElementById(hash.slice(1));
       if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
     }
@@ -26,10 +26,23 @@ function ScrollManager() {
   return null;
 }
 
+// If student clicks "Confirm email address" and lands on home page,
+// automatically redirect them to /members so their profile form opens!
+function AuthRedirectHandler() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (window.location.hash.includes('access_token')) {
+      navigate('/members');
+    }
+  }, [navigate]);
+  return null;
+}
+
 function App() {
   return (
     <Router>
       <ScrollManager />
+      <AuthRedirectHandler />
       <div className="antialiased bg-forge-dark min-h-screen">
         <Navbar />
         <Routes>

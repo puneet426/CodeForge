@@ -77,6 +77,13 @@ const Members = () => {
     return () => window.removeEventListener('codeforge:profile-updated', handleUpdate);
   }, []);
 
+  // Auto-open registration modal when arriving from email confirmation link
+  useEffect(() => {
+    if (window.location.hash.includes('access_token')) {
+      setShowForm(true);
+    }
+  }, []);
+
   // Hand-written lists + dynamic registrations, grouped by batch
   const batches = useMemo(() => BATCHES.map((b) => ({
     ...b,
