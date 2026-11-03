@@ -5,14 +5,10 @@ import {
   COLLEGE_EMAIL_DOMAIN,
   isCollegeEmail,
   isSupabaseConfigured,
-  sendCollegeEmailLink,
-  checkIfEmailConfirmed,
-  getCurrentAuthUser,
-  signOutOfCollegeAccount,
   fetchMemberByEmail,
   saveMemberProfile,
   getSavedLocalProfile,
-  supabase,
+  setSavedLocalProfile,
 } from '../lib/supabase';
 
 const EMPTY = {
@@ -40,85 +36,40 @@ const ROLES = [
 ];
 
 const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
-  // Step: 'check-auth' | 'enter-email' | 'check-inbox' | 'profile-form' | 'success'
-  const [step, setStep] = useState('check-auth');
-  const [emailInput, setEmailInput] = useState("");
-  const [verifiedEmail, setVerifiedEmail] = useState("");
-  const [isExistingMember, setIsExistingMember] = useState(false);
+  const saved = initialProfile || getSavedLocalProfile();
+  const [mode, setMode] = useState(saved ? "edit" : "register"); // 'register' | 'edit' | 'lookup' | 'success'
+  const [lookupEmail, setLookupEmail] = useState("");
+  const [isLookingUp, setIsLookingUp] = useState(false);
 
-  const [f, setF] = useState(EMPTY);
+  const [f, setF] = useState(() => {
+    if (saved) {
+      return {
+        name: saved.name || "",
+        email: saved.email || "",
+        roll: saved.roll || "",
+        batch: saved.batch || BATCHES[1]?.id || BATCHES[0].id,
+        branch: saved.branch || BRANCHES[0],
+        github: saved.github || "",
+        photo: saved.photo || "",
+        bio: saved.bio || "",
+        role: saved.role || "Member",
+        stack: Array.isArray(saved.stack) ? saved.stack.join(", ") : (saved.stack || ""),
+        projects: Array.isArray(saved.projects) && saved.projects.length 
+          ? [
+              saved.projects[0] || { title: "", desc: "", url: "" },
+              saved.projects[1] || { title: "", desc: "", url: "" },
+            ]
+          : [{ title: "", desc: "", url: "" }, { title: "", desc: "", url: "" }],
+        githubUrl: saved.github_url || saved.githubUrl || "",
+        linkedin: saved.linkedin || "",
+        website: saved.website || "",
+      };
+    }
+    return EMPTY;
+  });
+
   const [status, setStatus] = useState({ state: "idle", msg: "" });
   const [loading, setLoading] = useState(false);
-
-  // Check active Supabase authenticated session on mount
-  useEffect(() => {
-    let alive = true;
-    async function checkAuth() {
-      if (!isSupabaseConfigured) {
-        const local = initialProfile || getSavedLocalProfile();
-        if (local) {
-          populateForm(local);
-          setVerifiedEmail(local.email);
-          setIsExistingMember(true);
-        }
-        setStep('profile-form');
-        return;
-      }
-
-      const user = await getCurrentAuthUser();
-      if (!alive) return;
-
-      if (user && user.email) {
-        await handleAuthenticatedUser(user.email);
-      } else {
-        setStep('enter-email');
-      }
-    }
-
-    checkAuth();
-    return () => { alive = false; };
-  }, [initialProfile]);
-
-  // Real-time listener: Triggers when the user confirms in this browser
-  useEffect(() => {
-    if (!supabase) return;
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user?.email) {
-        await handleAuthenticatedUser(session.user.email);
-      }
-    });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, []);
-
-  // Cross-Device Sync: Polls Supabase every 2.5 seconds to see if the user confirmed on their phone!
-  useEffect(() => {
-    if (step !== 'check-inbox' || !verifiedEmail) return;
-
-    let timer;
-    let isCancelled = false;
-
-    async function checkCrossDevice() {
-      const isConfirmed = await checkIfEmailConfirmed(verifiedEmail);
-      if (isConfirmed && !isCancelled) {
-        await handleAuthenticatedUser(verifiedEmail);
-        return;
-      }
-      if (!isCancelled) {
-        timer = setTimeout(checkCrossDevice, 2500);
-      }
-    }
-
-    timer = setTimeout(checkCrossDevice, 2500);
-
-    return () => {
-      isCancelled = true;
-      if (timer) clearTimeout(timer);
-    };
-  }, [step, verifiedEmail]);
 
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -130,43 +81,6 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
       document.body.style.overflow = prev; 
     };
   }, [onClose]);
-
-  const handleAuthenticatedUser = async (email) => {
-    setVerifiedEmail(email);
-    const memberData = await fetchMemberByEmail(email);
-    if (memberData) {
-      populateForm(memberData);
-      setIsExistingMember(true);
-    } else {
-      setF(s => ({ ...s, email }));
-      setIsExistingMember(false);
-    }
-    setStep('profile-form');
-  };
-
-  const populateForm = (data) => {
-    setF({
-      name: data.name || "",
-      email: data.email || "",
-      roll: data.roll || "",
-      batch: data.batch || BATCHES[1]?.id || BATCHES[0].id,
-      branch: data.branch || BRANCHES[0],
-      github: data.github || "",
-      photo: data.photo || "",
-      bio: data.bio || "",
-      role: data.role || "Member",
-      stack: Array.isArray(data.stack) ? data.stack.join(", ") : (data.stack || ""),
-      projects: Array.isArray(data.projects) && data.projects.length 
-        ? [
-            data.projects[0] || { title: "", desc: "", url: "" },
-            data.projects[1] || { title: "", desc: "", url: "" },
-          ]
-        : [{ title: "", desc: "", url: "" }, { title: "", desc: "", url: "" }],
-      githubUrl: data.github_url || data.githubUrl || "",
-      linkedin: data.linkedin || "",
-      website: data.website || "",
-    });
-  };
 
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
   const setProject = (i, k) => (e) =>
@@ -182,67 +96,82 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
     }));
   };
 
-  // Step 1: Send Verification Link to College Email
-  const handleSendLink = async (e) => {
-    if (e) e.preventDefault();
-    const cleanEmail = (emailInput || verifiedEmail).trim().toLowerCase();
-    if (!isCollegeEmail(cleanEmail)) {
-      setStatus({ state: "error", msg: `Only official college emails ending in @${COLLEGE_EMAIL_DOMAIN} are permitted.` });
+  const emailBad = f.email && !isCollegeEmail(f.email);
+
+  // Look up existing member by college email (if using a different device)
+  const handleLookup = async (e) => {
+    e.preventDefault();
+    const clean = lookupEmail.trim().toLowerCase();
+    if (!isCollegeEmail(clean)) {
+      setStatus({ state: "error", msg: `Please enter a valid @${COLLEGE_EMAIL_DOMAIN} email.` });
       return;
     }
 
-    setLoading(true);
+    setIsLookingUp(true);
     setStatus({ state: "idle", msg: "" });
 
     try {
-      if (isSupabaseConfigured) {
-        await sendCollegeEmailLink(cleanEmail);
-      }
-      setVerifiedEmail(cleanEmail);
-      setStep('check-inbox');
-      setStatus({ state: "idle", msg: "" });
-    } catch (err) {
-      const msg = err.message || "";
-      if (msg.toLowerCase().includes("rate limit")) {
+      const found = await fetchMemberByEmail(clean);
+      if (found) {
+        setF({
+          name: found.name || "",
+          email: found.email || clean,
+          roll: found.roll || "",
+          batch: found.batch || BATCHES[1]?.id || BATCHES[0].id,
+          branch: found.branch || BRANCHES[0],
+          github: found.github || "",
+          photo: found.photo || "",
+          bio: found.bio || "",
+          role: found.role || "Member",
+          stack: Array.isArray(found.stack) ? found.stack.join(", ") : (found.stack || ""),
+          projects: Array.isArray(found.projects) && found.projects.length 
+            ? found.projects 
+            : [{ title: "", desc: "", url: "" }, { title: "", desc: "", url: "" }],
+          githubUrl: found.github_url || found.githubUrl || "",
+          linkedin: found.linkedin || "",
+          website: found.website || "",
+        });
+        setSavedLocalProfile(found);
+        setMode("edit");
+        setStatus({ state: "idle", msg: "" });
+      } else {
         setStatus({ 
           state: "error", 
-          msg: "Security cooldown active: Please wait 60 seconds before requesting another email, or click the link already in your inbox." 
+          msg: `No existing profile found for ${clean}. You can register as a new member below.` 
         });
-      } else {
-        setStatus({ state: "error", msg: msg || "Failed to send verification link." });
+        setF(s => ({ ...s, email: clean }));
+        setMode("register");
       }
+    } catch (err) {
+      setStatus({ state: "error", msg: "Lookup failed. Please check your connection." });
     } finally {
-      setLoading(false);
+      setIsLookingUp(false);
     }
   };
 
-  const handleSignOut = async () => {
-    await signOutOfCollegeAccount();
-    setStep('enter-email');
+  const handleForgetDevice = () => {
+    setSavedLocalProfile(null);
     setF(EMPTY);
-    setVerifiedEmail("");
-    setIsExistingMember(false);
+    setMode("register");
+    window.dispatchEvent(new CustomEvent('codeforge:profile-updated', { detail: null }));
   };
 
-  // Step 2: Save profile to Supabase database (Instant live publish)
+  // Save profile directly to Supabase
   const handleSubmitProfile = async (e) => {
     e.preventDefault();
-    const emailToUse = verifiedEmail || f.email;
-
-    if (!isCollegeEmail(emailToUse)) {
-      setStatus({ state: "error", msg: `Must use your verified @${COLLEGE_EMAIL_DOMAIN} email.` });
+    if (!isCollegeEmail(f.email)) {
+      setStatus({ state: "error", msg: `Please use your official college email ending in @${COLLEGE_EMAIL_DOMAIN}.` });
       return;
     }
 
     setLoading(true);
-    setStatus({ state: "sending", msg: "Publishing your profile to the live directory…" });
+    setStatus({ state: "sending", msg: "Publishing profile to live directory…" });
 
     const payload = {
       ...f,
-      email: emailToUse.trim().toLowerCase(),
+      email: f.email.trim().toLowerCase(),
       stack: typeof f.stack === 'string' ? f.stack.split(',').map(s => s.trim()).filter(Boolean) : f.stack,
       projects: f.projects.filter(p => p.title && p.title.trim()),
-      is_approved: true, // No admin approval needed
     };
 
     try {
@@ -251,13 +180,17 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
         saved = await saveMemberProfile(payload);
       } else {
         saved = payload;
+        setSavedLocalProfile(payload);
       }
 
       window.dispatchEvent(new CustomEvent('codeforge:profile-updated', { detail: saved }));
-      setStep('success');
+      setMode('success');
     } catch (err) {
       console.error(err);
-      setStatus({ state: "error", msg: err.message || "Could not publish profile. Please try again." });
+      setStatus({ 
+        state: "error", 
+        msg: err.message || "Could not publish profile. Please check that you ran the SQL policy update in Supabase." 
+      });
     } finally {
       setLoading(false);
     }
@@ -272,129 +205,103 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
         {/* Close Button */}
         <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold cursor-pointer">✕</button>
 
-        {/* ================= STEP 1: ENTER COLLEGE EMAIL ================= */}
-        {step === 'enter-email' && (
-          <div className="py-4">
-            <div className="inline-block px-3 py-1 mb-3 border border-forge-yellow/60 rounded-full bg-forge-yellow/10 text-forge-yellow text-xs font-bold tracking-widest">
-              OFFICIAL NIAMT EMAIL VERIFICATION
-            </div>
-            <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black mb-2">
-              Sign In with College Email
-            </h2>
-            <p className="text-gray-400 text-sm font-sans mb-6">
-              Enter your NIAMT student email. We will send a secure 1-click verification link directly to your inbox.
-            </p>
-
-            <form onSubmit={handleSendLink} className="space-y-4 max-w-lg">
-              <div>
-                <Label htmlFor="req-email">College Email ID <Req /></Label>
-                <input 
-                  id="req-email"
-                  type="email" 
-                  required
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder={`yourname@${COLLEGE_EMAIL_DOMAIN}`}
-                  className={input}
-                />
-                <p className="text-xs text-gray-500 mt-1 font-mono">
-                  Only @{COLLEGE_EMAIL_DOMAIN} permitted.
-                </p>
-              </div>
-
-              {status.state === "error" && (
-                <p className="text-xs text-red-400 font-bold">{status.msg}</p>
-              )}
-
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full py-3 bg-forge-yellow text-black font-black rounded-lg hover:bg-orange-400 disabled:opacity-50 transition-colors shadow-md cursor-pointer">
-                {loading ? "Sending Link…" : "Send Verification Link →"}
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* ================= STEP 2: CHECK INBOX (CROSS-DEVICE SYNC) ================= */}
-        {step === 'check-inbox' && (
-          <div className="py-6 text-center max-w-lg mx-auto space-y-6">
-            <div className="w-16 h-16 rounded-full bg-forge-yellow/15 text-forge-yellow flex items-center justify-center text-3xl mx-auto border border-forge-yellow/40">
-              ✉
-            </div>
+        {/* ================= LOOKUP VIEW ================= */}
+        {mode === "lookup" ? (
+          <form onSubmit={handleLookup} className="space-y-5 py-4 max-w-lg">
             <div>
-              <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black mb-2">
-                Check Your College Email
-              </h2>
-              <p className="text-gray-300 text-sm font-sans">
-                We sent a verification link to <span className="text-forge-yellow font-bold font-mono">{verifiedEmail}</span>.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl border border-forge-yellow/40 bg-forge-yellow/[0.06] text-left space-y-2.5">
-              <p className="text-sm font-bold text-white flex items-center gap-2">
-                <span>📱 / 💻</span> <span>Click on PC or Phone:</span>
-              </p>
-              <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                Open your student inbox and click <strong>"Confirm email address"</strong>.
-              </p>
-              <div className="pt-1 border-t border-forge-yellow/20 text-xs text-forge-yellow/90 font-sans">
-                ⚡ <strong>Cross-device sync active:</strong> Even if you tap the link on your phone, this PC screen will automatically detect it and open your profile form!
+              <div className="inline-block px-3 py-1 mb-3 border border-forge-yellow/60 rounded-full bg-forge-yellow/10 text-forge-yellow text-xs font-bold tracking-widest">
+                PROFILE LOOKUP
               </div>
+              <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black mb-1">
+                Find Your Profile
+              </h2>
+              <p className="text-gray-400 text-sm font-sans mb-4">
+                Enter the college email you previously registered with:
+              </p>
             </div>
 
-            {/* Listening animation */}
-            <div className="flex items-center justify-center gap-2 text-xs text-forge-yellow font-mono py-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-forge-yellow animate-ping" />
-              <span>Waiting for confirmation click…</span>
+            <div>
+              <Label htmlFor="lookup-email">College Email ID <Req /></Label>
+              <input 
+                id="lookup-email"
+                type="email" 
+                required
+                value={lookupEmail}
+                onChange={(e) => setLookupEmail(e.target.value)}
+                placeholder={`yourname@${COLLEGE_EMAIL_DOMAIN}`}
+                className={input}
+              />
             </div>
 
             {status.state === "error" && (
               <p className="text-xs text-red-400 font-bold">{status.msg}</p>
             )}
 
-            <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-white/10">
+            <div className="flex items-center gap-3">
               <button 
-                type="button" 
-                onClick={() => setStep('enter-email')} 
-                className="hover:text-white cursor-pointer">
-                ← Change Email
+                type="submit" 
+                disabled={isLookingUp}
+                className="px-6 py-2.5 bg-forge-yellow text-black font-black rounded-lg hover:bg-orange-400 disabled:opacity-50 transition-colors shadow-md cursor-pointer">
+                {isLookingUp ? "Looking up…" : "Fetch My Profile →"}
               </button>
               <button 
                 type="button" 
-                onClick={handleSendLink} 
-                disabled={loading}
-                className="text-forge-yellow hover:underline cursor-pointer disabled:opacity-50">
-                Resend Link
+                onClick={() => setMode("register")} 
+                className="text-xs text-gray-400 hover:text-white cursor-pointer">
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : mode === "success" ? (
+          /* ================= SUCCESS VIEW ================= */
+          <div className="py-8 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-3xl font-black mx-auto border border-green-500/40">
+              ✓
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-white">
+              Profile Published!
+            </h2>
+            <p className="text-gray-300 font-sans max-w-md mx-auto text-sm">
+              Your profile is now live on the Code Forge members directory. You can edit your details anytime from this browser.
+            </p>
+            <div className="pt-4">
+              <button onClick={onClose} className="px-8 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors cursor-pointer">
+                View on Members Wall →
               </button>
             </div>
           </div>
-        )}
-
-        {/* ================= STEP 3: PROFILE FORM ================= */}
-        {step === 'profile-form' && (
+        ) : (
+          /* ================= MAIN PROFILE FORM ================= */
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
               <div>
                 <h2 id="member-modal-title" className="text-2xl md:text-3xl font-black">
-                  {isExistingMember ? "Edit Member Profile" : "Register as a Member"}
+                  {mode === "edit" ? "Edit Member Profile" : "Register as a Member"}
                 </h2>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-xs text-green-400 font-mono">
-                    Verified ID: {verifiedEmail || f.email}
-                  </span>
-                </div>
+                <p className="text-gray-400 text-sm mt-1 font-sans">
+                  {mode === "edit"
+                    ? "Update your bio, tech stack, projects, and contact handles."
+                    : "Join the official Code Forge member directory using your NIAMT email."}
+                </p>
               </div>
 
-              {verifiedEmail && (
-                <button 
-                  type="button"
-                  onClick={handleSignOut} 
-                  className="text-xs text-gray-500 hover:text-red-400 transition-colors cursor-pointer">
-                  [ Sign Out ]
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {mode === "edit" ? (
+                  <button 
+                    type="button"
+                    onClick={handleForgetDevice} 
+                    className="text-xs text-gray-500 hover:text-red-400 transition-colors cursor-pointer">
+                    [ Switch Account ]
+                  </button>
+                ) : (
+                  <button 
+                    type="button"
+                    onClick={() => setMode("lookup")} 
+                    className="text-xs text-forge-yellow hover:underline cursor-pointer">
+                    Already registered? Find profile →
+                  </button>
+                )}
+              </div>
             </div>
 
             <form onSubmit={handleSubmitProfile} className="space-y-5">
@@ -407,16 +314,23 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
                   <input id="m-name" required maxLength={80} value={f.name} onChange={set("name")} placeholder="e.g. Akash Kumar" className={input} />
                 </div>
                 <div>
-                  <Label htmlFor="m-email">Verified College Email <Req /></Label>
+                  <Label htmlFor="m-email">College Email ID <Req /></Label>
                   <input 
                     id="m-email" 
                     type="email" 
                     required 
-                    readOnly 
-                    value={verifiedEmail || f.email} 
-                    className={`${input} opacity-75 cursor-not-allowed border-green-500/40 bg-green-500/5`} 
+                    disabled={mode === "edit"}
+                    value={f.email} 
+                    onChange={set("email")}
+                    placeholder={`yourname@${COLLEGE_EMAIL_DOMAIN}`} 
+                    aria-invalid={emailBad || undefined}
+                    className={`${input} ${mode === "edit" ? "opacity-75 cursor-not-allowed" : ""} ${emailBad ? "border-red-500/70 focus:border-red-500" : ""}`} 
                   />
-                  <p className="text-[11px] text-green-400/80 mt-1">✓ Verified with official NIAMT email</p>
+                  {emailBad ? (
+                    <p className="text-xs text-red-400 mt-1">Must be an official @{COLLEGE_EMAIL_DOMAIN} address.</p>
+                  ) : (
+                    <p className="text-[11px] text-gray-500 mt-1">Must end with @{COLLEGE_EMAIL_DOMAIN}</p>
+                  )}
                 </div>
 
                 <div>
@@ -503,32 +417,12 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
 
               <button type="submit" disabled={loading}
                 className="w-full py-3.5 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 disabled:opacity-60 transition-colors shadow-[0_0_20px_rgba(249,115,22,0.3)] cursor-pointer">
-                {loading ? "Publishing Profile…" : isExistingMember ? "[ Save Changes ]" : "[ Publish Profile Instantly ]"}
+                {loading ? "Publishing Profile…" : mode === "edit" ? "[ Save Changes ]" : "[ Publish Profile Instantly ]"}
               </button>
               <p className="text-center text-xs text-gray-500">
-                ⚡ Instant publish: Your profile will appear immediately on the Members page upon saving.
+                ⚡ Instant live publication: Your profile appears immediately on the Members page upon saving.
               </p>
             </form>
-          </div>
-        )}
-
-        {/* ================= STEP 4: SUCCESS ================= */}
-        {step === 'success' && (
-          <div className="py-8 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-3xl font-black mx-auto border border-green-500/40">
-              ✓
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black text-white">
-              Profile Published!
-            </h2>
-            <p className="text-gray-300 font-sans max-w-md mx-auto text-sm">
-              Your profile is now live on the Code Forge members directory. You can edit your details anytime using your verified college ID.
-            </p>
-            <div className="pt-4">
-              <button onClick={onClose} className="px-8 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors cursor-pointer">
-                View on Members Wall →
-              </button>
-            </div>
           </div>
         )}
       </div>
