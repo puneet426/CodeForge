@@ -260,8 +260,8 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 bg-black/85 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-forge-card border border-white/10 rounded-2xl p-6 md:p-8 my-8 shadow-2xl text-white">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md p-4 sm:p-6 md:p-8 flex justify-center items-start">
+      <div className="relative w-full max-w-2xl bg-[#141414] border border-white/20 rounded-2xl p-6 md:p-8 my-6 shadow-[0_20px_60px_rgba(0,0,0,0.9)] text-white">
         
         {/* Close Button */}
         <button
