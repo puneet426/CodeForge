@@ -46,54 +46,92 @@ const GitHubIcon = (p) => (
 );
 
 // Unified clean card for members. Equal layout for all members.
-const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar, bio, stack = [], projects = [] }) => (
-  <div className="group h-full flex flex-col rounded-2xl border border-white/10 bg-black/50 p-5 hover:border-forge-yellow/60 hover:-translate-y-0.5 transition-all duration-300">
-    <div className="flex items-start gap-4">
-      <Avatar name={name} src={avatar} />
-      <div className="min-w-0 flex-1">
-        <h3 className="text-white font-bold leading-snug group-hover:text-forge-yellow transition-colors truncate">{name}</h3>
-        {line1 && <p className="text-sm text-gray-300 mt-0.5 font-sans leading-snug">{line1}</p>}
-        {line2 && <p className="text-xs text-forge-yellow font-mono mt-1 font-bold">{line2}</p>}
+const PersonCard = ({ name, line1, line2, chip, linkedin, github, avatar, bio, stack = [], projects = [] }) => {
+  const [expanded, setExpanded] = React.useState(false);
+  const hasProjects = Array.isArray(projects) && projects.length > 0;
+
+  return (
+    <div 
+      onClick={() => setExpanded((prev) => !prev)}
+      className="group h-full flex flex-col rounded-2xl border border-white/10 bg-black/50 p-5 hover:border-forge-yellow/60 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+    >
+      <div className="flex items-start gap-4">
+        <Avatar name={name} src={avatar} />
+        <div className="min-w-0 flex-1">
+          <h3 className="text-white font-bold leading-snug group-hover:text-forge-yellow transition-colors truncate">{name}</h3>
+          {line1 && <p className="text-sm text-gray-300 mt-0.5 font-sans leading-snug">{line1}</p>}
+          {line2 && <p className="text-xs text-forge-yellow font-mono mt-1 font-bold">{line2}</p>}
+        </div>
+      </div>
+
+      {bio && (
+        <p className={`mt-3 text-sm text-gray-400 font-sans leading-relaxed ${expanded ? "" : "line-clamp-2"}`}>
+          {bio}
+        </p>
+      )}
+
+      {stack.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Tech stack">
+          {stack.slice(0, 8).map((t) => (
+            <li key={t} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-mono text-gray-300">{t}</li>
+          ))}
+        </ul>
+      )}
+
+      {/* Projects: Shown ONLY when card is clicked / expanded */}
+      {expanded && hasProjects && (
+        <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
+          <p className="text-xs text-forge-yellow font-mono font-bold tracking-wider">FEATURED PROJECTS</p>
+          <ul className="space-y-2" aria-label="Projects">
+            {projects.map((p, idx) => (
+              <li key={idx} className="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 text-xs font-sans">
+                {p.url ? (
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-mono font-bold text-forge-yellow hover:underline flex items-center justify-between"
+                  >
+                    <span>{p.title}</span>
+                    <span className="text-[10px] text-gray-400">↗</span>
+                  </a>
+                ) : (
+                  <span className="font-mono font-bold text-white">{p.title}</span>
+                )}
+                {p.desc && <p className="text-gray-400 mt-1 text-[11px] leading-relaxed">{p.desc}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="mt-auto pt-4 flex items-center justify-between gap-2 border-t border-white/5">
+        {hasProjects ? (
+          <span className="text-[11px] font-mono text-forge-yellow/90 font-bold hover:underline">
+            {expanded ? "▴ Hide Details" : `▸ ${projects.length} Project${projects.length > 1 ? "s" : ""} ↗`}
+          </span>
+        ) : (
+          <span className="text-[11px] font-mono uppercase tracking-wider text-gray-500 truncate">{chip || ""}</span>
+        )}
+
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          {github && (
+            <a href={`https://github.com/${github}`} target="_blank" rel="noopener noreferrer" aria-label={`${name} on GitHub`}
+              className="w-8 h-8 rounded-lg border border-white/15 flex items-center justify-center text-gray-300 hover:text-black hover:bg-forge-yellow hover:border-forge-yellow transition-colors">
+              <GitHubIcon className="w-3.5 h-3.5" />
+            </a>
+          )}
+          {linkedin && (
+            <a href={linkedin} target="_blank" rel="noopener noreferrer" aria-label={`Connect with ${name} on LinkedIn`}
+              className="inline-flex items-center gap-1.5 px-2.5 h-8 rounded-lg border border-forge-yellow/50 text-forge-yellow text-xs font-mono font-bold hover:bg-forge-yellow hover:text-black transition-colors">
+              <LinkedInIcon className="w-3 h-3" /> Connect
+            </a>
+          )}
+        </div>
       </div>
     </div>
-    {bio && <p className="mt-3 text-sm text-gray-400 font-sans leading-relaxed line-clamp-3">{bio}</p>}
-    {stack.length > 0 && (
-      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Tech stack">
-        {stack.slice(0, 6).map((t) => (
-          <li key={t} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-mono text-gray-300">{t}</li>
-        ))}
-      </ul>
-    )}
-    {projects.length > 0 && (
-      <ul className="mt-3 space-y-1.5" aria-label="Projects">
-        {projects.map((p) => (
-          <li key={p.title} className="text-xs font-sans leading-snug">
-            {p.url
-              ? <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-mono font-bold text-white hover:text-forge-yellow transition-colors">{p.title} ↗</a>
-              : <span className="font-mono font-bold text-white">{p.title}</span>}
-            {p.desc && <span className="text-gray-500"> — {p.desc}</span>}
-          </li>
-        ))}
-      </ul>
-    )}
-    <div className="mt-auto pt-4 flex items-center justify-between gap-2">
-      {chip ? <span className="text-[11px] font-mono uppercase tracking-wider text-gray-500 truncate">{chip}</span> : <span />}
-      <div className="flex items-center gap-2">
-        {github && (
-          <a href={`https://github.com/${github}`} target="_blank" rel="noopener noreferrer" aria-label={`${name} on GitHub`}
-            className="w-9 h-9 rounded-lg border border-white/15 flex items-center justify-center text-gray-300 hover:text-black hover:bg-forge-yellow hover:border-forge-yellow transition-colors">
-            <GitHubIcon className="w-4 h-4" />
-          </a>
-        )}
-        {linkedin && (
-          <a href={linkedin} target="_blank" rel="noopener noreferrer" aria-label={`Connect with ${name} on LinkedIn`}
-            className="inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-forge-yellow/50 text-forge-yellow text-xs font-mono font-bold hover:bg-forge-yellow hover:text-black transition-colors">
-            <LinkedInIcon className="w-3.5 h-3.5" /> Connect
-          </a>
-        )}
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 export default PersonCard;
