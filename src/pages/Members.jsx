@@ -163,16 +163,23 @@ const Members = () => {
           THE PEOPLE OF THE FORGE
         </div>
         <h1 className="text-4xl md:text-7xl font-black text-white">&lt;Members/&gt;</h1>
-        <p className="text-gray-400 mt-4 font-sans text-lg">
+        <p className="text-gray-300 mt-3 font-sans text-base md:text-lg">
+          Come for the code, stay for the community.
+        </p>
+        <p className="text-gray-500 mt-1.5 font-mono text-xs">
           {total > 0 ? `${total} member${total === 1 ? "" : "s"} across ${filled} batch${filled === 1 ? "" : "es"}.` : "Every Code Forge member, batch by batch."}
         </p>
 
-        <button 
-          onClick={() => setShowForm(true)}
-          className="mt-6 px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
-          + Register as a member
-        </button>
-        <p className="text-xs text-gray-500 mt-2 font-mono">Verify with @niamt.ac.in email</p>
+        {!savedProfile && (
+          <div className="mt-6">
+            <button 
+              onClick={() => setShowForm(true)}
+              className="px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
+              + Register as a member
+            </button>
+            <p className="text-xs text-gray-500 mt-2 font-mono">Verify with @niamt.ac.in email</p>
+          </div>
+        )}
       </div>
 
       {/* Main Content Area */}
