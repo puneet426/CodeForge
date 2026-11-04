@@ -9,7 +9,7 @@ import {
   getSavedLocalProfile 
 } from '../lib/supabase';
 
-const githubFromUrl = (url = "") => (url.match(/github\.com\/([A-Za-z0-9-]{1,39})\/?$/i) || [])[1] || "";
+const githubFromUrl = (url = "") => (((url || "")).match(/github\.com\/([A-Za-z0-9-]{1,39})\/?$/i) || [])[1] || "";
 
 // Fetch members from Supabase, Apps Script, or local cache
 const useRegisteredMembers = (refreshTrigger) => {
