@@ -118,11 +118,11 @@ const Members = () => {
 
   // Clean alphabetical list of all members in the batch
   const list = useMemo(() => {
-    if (!batch) return [];
+    if (!batch || !batch.members) return [];
     const s = q.trim().toLowerCase();
     return batch.members
-      .filter((m) => !s || `${m.name} ${m.branch || ""} ${m.role || ""} ${m.community || ""} ${(m.stack || []).join(" ")}`.toLowerCase().includes(s))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .filter((m) => !s || `${m.name || ""} ${m.branch || ""} ${m.role || ""} ${m.community || ""} ${(m.stack || []).join(" ")}`.toLowerCase().includes(s))
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, [batch, q]);
 
   return (

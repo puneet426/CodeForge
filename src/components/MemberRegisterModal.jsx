@@ -473,7 +473,7 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
                 <div>
                   <Label htmlFor="m-photo">Avatar URL</Label>
                   <div className="flex gap-2">
-                    <Avatar member={{ name: f.name || "Preview", photo: f.photo, github: f.github }} className="w-10 h-10" />
+                    <Avatar name={f.name || "Preview"} src={f.photo} size="w-10 h-10" />
                     <input id="m-photo" type="url" value={f.photo} onChange={set("photo")} placeholder="https://… or auto-filled by GitHub" className={input} />
                   </div>
                 </div>

@@ -1,16 +1,16 @@
 import React from 'react';
 
-const initials = (name) =>
-  name.replace(/[^A-Za-z\s]/g, " ").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
+const initials = (name = "") =>
+  (name || "?").replace(/[^A-Za-z\s]/g, " ").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
 
 // Deterministic warm hue per name so avatars look varied but on-brand.
-const hue = (name) => {
+const hue = (name = "") => {
   let h = 0;
-  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
+  for (const c of (name || "?")) h = (h * 31 + c.charCodeAt(0)) % 360;
   return 15 + (h % 30); // orange–amber range
 };
 
-export const Avatar = ({ name, src, size = "w-14 h-14" }) => (
+export const Avatar = ({ name = "User", src, size = "w-14 h-14" }) => (
   <div className={`${size} shrink-0 rounded-full p-0.5 bg-gradient-to-br from-forge-yellow/80 to-forge-yellow/10`}>
     {src ? (
       <img src={src} alt={name} loading="lazy" className="w-full h-full rounded-full object-cover bg-black" />
