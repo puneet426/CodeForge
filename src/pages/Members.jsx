@@ -134,15 +134,15 @@ const Members = () => {
           <span className="text-forge-yellow font-bold">Code Forge</span> / Members Wall
         </div>
 
-        {/* Person Icon "Edit Profile" Button in top-right of Member Section */}
+        {/* Person Icon "Profile" Button in top-right of Member Section */}
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-forge-yellow/50 bg-black/60 hover:bg-forge-yellow/15 hover:border-forge-yellow text-white transition-all shadow-md group font-mono text-xs md:text-sm cursor-pointer"
-          title={savedProfile ? `Edit profile for ${savedProfile.name}` : "Click to register or edit profile"}
+          title={savedProfile ? `Profile for ${savedProfile.name}` : "Click to view or edit profile"}
         >
           <span className="w-6 h-6 rounded-full bg-forge-yellow/20 flex items-center justify-center text-forge-yellow group-hover:bg-forge-yellow group-hover:text-black transition-colors shrink-0">
             {savedProfile?.photo ? (
-              <img src={savedProfile.photo} alt={savedProfile.name} className="w-full h-full rounded-full object-cover" />
+              <img src={savedProfile.photo} alt={savedProfile.name} referrerPolicy="no-referrer" className="w-full h-full rounded-full object-cover" />
             ) : (
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2" />
@@ -150,7 +150,7 @@ const Members = () => {
               </svg>
             )}
           </span>
-          <span className="font-bold">Edit Profile</span>
+          <span className="font-bold">Profile</span>
           {savedProfile && (
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-0.5" title="Connected" />
           )}
@@ -167,23 +167,12 @@ const Members = () => {
           {total > 0 ? `${total} member${total === 1 ? "" : "s"} across ${filled} batch${filled === 1 ? "" : "es"}.` : "Every Code Forge member, batch by batch."}
         </p>
 
-        {savedProfile ? (
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <button 
-              onClick={() => setShowForm(true)}
-              className="px-6 py-2.5 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
-              <span>Edit My Profile</span>
-              <span className="text-xs bg-black/20 px-2 py-0.5 rounded font-mono">({savedProfile.name})</span>
-            </button>
-          </div>
-        ) : (
-          <button 
-            onClick={() => setShowForm(true)}
-            className="mt-6 px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
-            + Register as a member
-          </button>
-        )}
-        <p className="text-xs text-gray-500 mt-2 font-mono">Verify with @niamt.ac.in email · Instant publication</p>
+        <button 
+          onClick={() => setShowForm(true)}
+          className="mt-6 px-7 py-3 rounded-lg bg-forge-yellow text-black font-black hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.3)] cursor-pointer">
+          + Register as a member
+        </button>
+        <p className="text-xs text-gray-500 mt-2 font-mono">Verify with @niamt.ac.in email</p>
       </div>
 
       {/* Main Content Area */}

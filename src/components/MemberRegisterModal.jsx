@@ -400,31 +400,31 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
         {/* ================= STAGE 3: PROFILE FORM ================= */}
         {step === 'profile-form' && (
           <div>
-            <div className="mb-6 flex justify-between items-start">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-green-500/10 text-green-400 border border-green-500/20">
-                    ✓ VERIFIED STUDENT
-                  </span>
-                  <span className="text-xs text-gray-400 font-mono">
-                    {verifiedEmail || f.email}
-                  </span>
-                </div>
-                <h2 className="text-2xl md:text-3xl font-black text-white">
-                  {isExistingMember ? "Edit Your Profile" : "Create Member Profile"}
-                </h2>
-                <p className="text-gray-400 text-sm mt-1 font-sans">
-                  {isExistingMember 
-                    ? "Update your stack, projects, and bio. Changes publish immediately." 
-                    : "Fill in your details to be featured in the official NIAMT Code Forge directory."}
-                </p>
+            <div className="mb-6 pr-10">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-green-500/10 text-green-400 border border-green-500/20">
+                  ✓ VERIFIED STUDENT
+                </span>
+                <span className="text-xs text-gray-400 font-mono">
+                  {verifiedEmail || f.email}
+                </span>
+                <span className="text-gray-600">·</span>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="text-xs text-gray-400 hover:text-red-400 cursor-pointer underline font-sans transition-colors"
+                >
+                  Sign out
+                </button>
               </div>
-              <button
-                onClick={handleSignOut}
-                className="text-xs text-gray-400 hover:text-red-400 cursor-pointer underline font-sans"
-              >
-                Sign out
-              </button>
+              <h2 className="text-2xl md:text-3xl font-black text-white">
+                {isExistingMember ? "Edit Your Profile" : "Create Member Profile"}
+              </h2>
+              <p className="text-gray-400 text-sm mt-1 font-sans">
+                {isExistingMember 
+                  ? "Update your stack, projects, and bio. Changes publish immediately." 
+                  : "Fill in your details to be featured in the official NIAMT Code Forge directory."}
+              </p>
             </div>
 
             <form onSubmit={handleSubmitProfile} className="space-y-5">
