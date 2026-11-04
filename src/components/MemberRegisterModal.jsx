@@ -81,7 +81,7 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
 
     checkAuth();
     return () => { alive = false; };
-  }, [initialProfile]);
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
