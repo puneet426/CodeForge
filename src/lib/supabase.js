@@ -6,14 +6,26 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    })
   : null;
 
 const LOCAL_STORAGE_KEY = 'codeforge_member_profile';
 
 export const COLLEGE_EMAIL_DOMAIN = 'niamt.ac.in';
-export const isCollegeEmail = (email = '') =>
-  new RegExp(`^[^\\s@]+@${COLLEGE_EMAIL_DOMAIN.replace(/\\./g, '\\.')}$`, 'i').test(email.trim());
+
+// Strict NIAMT student email validation:
+// Real student emails follow the pattern containing branch code, roll number & batch year (e.g. ce4052024@niamt.ac.in).
+// This strictly rejects fake/random emails like abc@niamt.ac.in that have no student roll/year.
+export const isCollegeEmail = (email = '') => {
+  const clean = (email || '').trim().toLowerCase();
+  return /^[a-z0-9._%+-]*[0-9]+[a-z0-9._%+-]*@niamt\.ac\.in$/i.test(clean);
+};
 
 // Local profile cache for instant loading & editing on this device
 export const getSavedLocalProfile = () => {
@@ -39,7 +51,75 @@ export const setSavedLocalProfile = (profile) => {
 };
 
 // -------------------------------------------------------------
-// Direct Members Database Operations (Instant, Zero Email Limits)
+// Authentication with NIAMT College Email (OTP / Magic Link)
+// -------------------------------------------------------------
+
+// Send 6-digit OTP to college email
+export const sendCollegeEmailOtp = async (email) => {
+  if (!supabase) {
+    throw new Error('Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env');
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  if (!isCollegeEmail(cleanEmail)) {
+    throw new Error(`Only official college emails (e.g. ce4052024@niamt.ac.in) are permitted.`);
+  }
+
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email: cleanEmail,
+    options: {
+      shouldCreateUser: true,
+      emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/members` : undefined,
+    },
+  });
+
+  if (error) {
+    console.error('sendCollegeEmailOtp error:', error);
+    throw new Error(error.message || 'Failed to send verification code to college email.');
+  }
+
+  return data;
+};
+
+// Verify 6-digit OTP
+export const verifyCollegeEmailOtp = async (email, token) => {
+  if (!supabase) {
+    throw new Error('Supabase is not configured.');
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: cleanEmail,
+    token: token.trim(),
+    type: 'email',
+  });
+
+  if (error) {
+    console.error('verifyCollegeEmailOtp error:', error);
+    throw new Error(error.message || 'Invalid or expired OTP. Please check and try again.');
+  }
+
+  return data; // contains session and user
+};
+
+// Get current signed-in user
+export const getCurrentAuthUser = async () => {
+  if (!supabase) return null;
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+};
+
+// Sign out
+export const signOutOfCollegeAccount = async () => {
+  if (supabase) {
+    await supabase.auth.signOut();
+  }
+  setSavedLocalProfile(null);
+  window.dispatchEvent(new CustomEvent('codeforge:profile-updated', { detail: null }));
+};
+
+// -------------------------------------------------------------
+// Members Database Operations (Instant, Zero Admin Bottlenecks)
 // -------------------------------------------------------------
 
 // Fetch all members from Supabase
@@ -82,7 +162,7 @@ export const saveMemberProfile = async (payload) => {
 
   const cleanEmail = payload.email.trim().toLowerCase();
   if (!isCollegeEmail(cleanEmail)) {
-    throw new Error(`Only official college emails ending in @${COLLEGE_EMAIL_DOMAIN} can register.`);
+    throw new Error(`Only official NIAMT student emails (e.g. ce4052024@niamt.ac.in) are permitted.`);
   }
 
   const record = {

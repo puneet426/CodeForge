@@ -23,8 +23,12 @@ CREATE TABLE IF NOT EXISTS public.members (
     github_url TEXT,
     linkedin TEXT,
     website TEXT,
+    pin TEXT, -- 4-digit secret PIN for self-serve profile editing
     is_approved BOOLEAN DEFAULT true -- Instant live publication!
 );
+
+-- Ensure pin column exists if table was already created
+ALTER TABLE public.members ADD COLUMN IF NOT EXISTS pin TEXT;
 
 -- 2. Indexes for fast batch & email queries
 CREATE INDEX IF NOT EXISTS idx_members_batch ON public.members(batch);
