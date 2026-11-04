@@ -400,21 +400,27 @@ const MemberRegisterModal = ({ onClose, initialProfile = null }) => {
         {/* ================= STAGE 3: PROFILE FORM ================= */}
         {step === 'profile-form' && (
           <div>
-            <div className="mb-6 pr-10">
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-green-500/10 text-green-400 border border-green-500/20">
-                  ✓ VERIFIED STUDENT
+            <div className="mb-6 pr-12">
+              <div className="flex items-center gap-2.5 mb-3 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Verified Student
                 </span>
-                <span className="text-xs text-gray-400 font-mono">
+                <span className="text-xs text-gray-400 font-mono shrink-0">
                   {verifiedEmail || f.email}
                 </span>
-                <span className="text-gray-600">·</span>
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="text-xs text-gray-400 hover:text-red-400 cursor-pointer underline font-sans transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 text-xs font-mono font-bold transition-all cursor-pointer shadow-sm group shrink-0"
+                  title="Sign out of this college account"
                 >
-                  Sign out
+                  <svg className="w-3 h-3 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  <span>Sign out</span>
                 </button>
               </div>
               <h2 className="text-2xl md:text-3xl font-black text-white">

@@ -104,6 +104,7 @@ export const verifyCollegeEmailOtp = async (email, token) => {
 
 // Get current signed-in user
 export const getCurrentAuthUser = async () => {
+  if (typeof window !== 'undefined' && window.__mockUser) return window.__mockUser;
   if (!supabase) return null;
   const { data: { user } } = await supabase.auth.getUser();
   return user;
