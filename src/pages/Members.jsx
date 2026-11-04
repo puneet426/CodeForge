@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PersonCard from '../components/PersonCard';
 import MemberRegisterModal from '../components/MemberRegisterModal';
+import MemberDetailModal from '../components/MemberDetailModal';
 import { Reveal } from '../components/ui';
 import { BATCHES, MEMBERS_API } from '../data/members';
 import { 
   isSupabaseConfigured, 
   fetchMembersFromSupabase, 
-  getSavedLocalProfile 
+  fetchMemberByEmail,
+  getCurrentAuthUser,
+  getSavedLocalProfile,
+  setSavedLocalProfile,
 } from '../lib/supabase';
 
 const githubFromUrl = (url = "") => (((url || "")).match(/github\.com\/([A-Za-z0-9-]{1,39})\/?$/i) || [])[1] || "";
@@ -64,6 +68,7 @@ const Members = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { members: registered, loading } = useRegisteredMembers(refreshTrigger);
   const [showForm, setShowForm] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [savedProfile, setSavedProfile] = useState(() => getSavedLocalProfile());
   const closeForm = useCallback(() => setShowForm(false), []);
 
@@ -77,6 +82,27 @@ const Members = () => {
     return () => window.removeEventListener('codeforge:profile-updated', handleUpdate);
   }, []);
 
+  // Sync logged in user profile on mount
+  useEffect(() => {
+    async function checkActiveSession() {
+      if (isSupabaseConfigured) {
+        try {
+          const user = await getCurrentAuthUser();
+          if (user?.email) {
+            const profile = await fetchMemberByEmail(user.email);
+            if (profile) {
+              setSavedLocalProfile(profile);
+              setSavedProfile(profile);
+            }
+          }
+        } catch (err) {
+          console.warn('Session profile check failed:', err);
+        }
+      }
+    }
+    checkActiveSession();
+  }, []);
+
   // Auto-open registration modal when arriving from email confirmation link
   useEffect(() => {
     if (window.location.hash.includes('access_token')) {
@@ -88,13 +114,17 @@ const Members = () => {
   const batches = useMemo(() => BATCHES.map((b) => ({
     ...b,
     members: [
-      ...b.members,
+      ...b.members.map((m) => ({ ...m, batch: b.id })),
       ...registered
         .filter((m) => m.batch === b.id)
         .map((m) => {
           const github = m.github || githubFromUrl(m.githubUrl || m.github_url);
           return {
+            id: m.id,
+            email: m.email,
             name: m.name,
+            roll: m.roll,
+            batch: m.batch,
             branch: m.branch,
             role: m.role || "Member",
             community: m.community,
@@ -104,6 +134,8 @@ const Members = () => {
             bio: m.bio,
             stack: Array.isArray(m.stack) ? m.stack : (typeof m.stack === 'string' ? m.stack.split(',').map(s => s.trim()) : []),
             projects: Array.isArray(m.projects) ? m.projects : [],
+            website: m.website || undefined,
+            github_url: m.github_url || m.githubUrl || (github ? `https://github.com/${github}` : undefined),
           };
         }),
     ],
@@ -220,9 +252,11 @@ const Members = () => {
         ) : list.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 py-20 text-center text-gray-500">
             <p className="text-gray-400">No members listed for batch {batch?.label} yet.</p>
-            <button onClick={() => setShowForm(true)} className="mt-4 text-forge-yellow font-bold hover:underline cursor-pointer">
-              Be the first to register →
-            </button>
+            {!savedProfile && (
+              <button onClick={() => setShowForm(true)} className="mt-4 text-forge-yellow font-bold hover:underline cursor-pointer">
+                Be the first to register →
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -239,12 +273,31 @@ const Members = () => {
                   stack={m.stack} 
                   projects={m.projects}
                   avatar={m.avatar} 
+                  onSelect={() => setSelectedMember(m)}
                 />
               </Reveal>
             ))}
           </div>
         )}
       </div>
+
+      {/* Member Details Modal (appears when member card is clicked, similar to EventModal) */}
+      {selectedMember && (
+        <MemberDetailModal 
+          member={selectedMember} 
+          onClose={() => setSelectedMember(null)}
+          onEdit={() => {
+            setSelectedMember(null);
+            setShowForm(true);
+          }}
+          isCurrentUser={Boolean(
+            savedProfile && (
+              (selectedMember.email && savedProfile.email && selectedMember.email.toLowerCase() === savedProfile.email.toLowerCase()) ||
+              (selectedMember.name && savedProfile.name && selectedMember.name.toLowerCase() === savedProfile.name.toLowerCase())
+            )
+          )}
+        />
+      )}
 
       {/* Member Registration & Edit Modal */}
       {showForm && (
